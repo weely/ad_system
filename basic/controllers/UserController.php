@@ -6,7 +6,7 @@ use Yii;
 use app\models\User;
 use app\models\UserSearch;
 //use yii\web\Controller;
-use app\controllers\LoginCheckController as controller;
+use app\controllers\LoginCheckController as Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 

@@ -10,15 +10,16 @@ $this->title = "素材详情";
 
 $this->context->layout = false;
 ?>
+
 <div class="courses-view">
     <div>
         <div style="">
             <h4 style="text-align: center">广告位预览</h4>
-            <div id="sc_preview" style="background: rgba(42,171,210,0.24);padding: 10px;margin-left: 135px;margin-right: 135px;" class="row">
+            <?php if ($model['is_h5']=='0'): ?>
+            <div style="background: rgba(42,171,210,0.24);padding: 10px;margin-left: 135px;margin-right: 135px;" class="row">
                 <h5><?=$model['ad_sc_title']?></h5>
                 <div class="col-lg-3" style="padding: 0px;">
-                    <img src="<?php echo "/uploads/".Yii::$app->user->getIdentity('"_identity":"yii\web\User"')['username']
-                        .'/logo/'.$model->logo; ?>" style="width: 70px;height: 70px;"></div>
+                    <img src="<?php echo $model->logo; ?>" style="width: 70px;height: 70px;"></div>
                 <div class="col-lg-9">
                     <div>
                         <?php foreach (explode(',',$model['properties']) as $tag): ?>
@@ -36,6 +37,11 @@ $this->context->layout = false;
                     </div>
                 </div>
             </div>
+            <?php elseif($model['is_h5']=='1'): ?>
+            <div style="margin-left: 135px;margin-right: 135px;">
+                <img src="<?php echo $model['title_img'];?>" style="width: 270px;height: 150px;">
+            </div>
+            <?php endif; ?>
         </div>
 
         <div id="sc_html" style="text-align: center">

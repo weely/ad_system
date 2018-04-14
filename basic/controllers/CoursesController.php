@@ -92,7 +92,8 @@ class CoursesController extends Controller
         }
 
         $model = new Courses();
-
+//        $model = $model->find()->where(['id'=>$model->id])->asArray()->all();
+//        $model = $model->findAll($model);
         return $this->render('create', [
             'model' => $model,
             'plans' => $plans
@@ -117,29 +118,32 @@ class CoursesController extends Controller
 //  广告LOGO          logo
 //  富文本编辑框       edit_html
 //  HTML源文件        img_html
-
             $model->user_id = $user_id;
             $model->plan_id = $request->post('plan_id');
             $model->tf_status = 0;
 //            $model->tf_type = 0;
 //            $model->tf_value = 0;
-            $model->is_online = $request->post('is_online');
-            $model->is_h5 = $request->post('is_h5');
-            $model->title_img = $request->post('title_img');
-            $model->ad_sc_title = $request->post('wz_title');
-//            $model->ad_type = '';
+            $model->is_online = $request->post('is_online') ?: '0';
+            $model->is_h5 = $request->post('is_h5') ?: '0';
+            $model->title_img = $request->post('title_img') ?: '';
+            $model->ad_sc_title = $request->post('sc_title');
+            $model->ad_type = '';
             $model->tag_ids = '';
-            $model->logo = $request->post('logo');
-            $model->img_html = $request->post('img_html');
-            $model->tags = $request->post('tags');
-            $model->logo = $request->post('logo');
+            $model->logo = $request->post('logo') ?: '';
 
-//            var_dump($model);
+//            var_dump($request->post('is_h5'));
 //            return;
+
+            $model->img_html = $request->post('img_html') ?: '';
+            $model->properties = $request->post('properties') ?: '';
+            $model->tags = $request->post('tags') ?: '';
+            $model->logo = $request->post('logo') ?: '';
+
             if ($model->save()){
                 return $this->redirect('/index.php?r=courses/check-page');
             } else {
-                return '';
+                var_dump($model->errors);
+//                return $this->render('error',[]);
             }
         }
     }
@@ -175,6 +179,7 @@ class CoursesController extends Controller
                 ];
             }
 //            $file_name = strstr($file_name,'.') ? $file_name : ($file_name.'.'.$type);
+//            $user_path_show = "/uploads/".$username;
             $user_path = $_SERVER['DOCUMENT_ROOT']."/uploads/".$username;
             if (strtolower($request->post('file_name')) == 'logo') {
                 $user_path .= '/logo';
@@ -192,11 +197,12 @@ class CoursesController extends Controller
 //            $move_to_file = $user_path."/".time().rand(1,1000).substr($file_name,strrpos($file_name,"."));
 //            $move_to_file = $user_path."/".time().rand(1,1000).".".$file_name;
             $move_to_file = $user_path."/".$file_name;
+
             if(move_uploaded_file($uploaded_file,iconv("utf-8","gb2312",$move_to_file))) {
                 return [
                     'status' => 'true',
-                    'msg' => $file_name.'上传成功'
-                    ];
+                    'msg' => substr($move_to_file,strlen($_SERVER['DOCUMENT_ROOT']))
+                ];
             } else {
                 return [
                     'status'=>'error',
@@ -225,13 +231,6 @@ class CoursesController extends Controller
             ->where($params)
             ->asArray()
             ->all();
-
-        $model->title_img = "/uploads/".Yii::$app->user->getIdentity('"_identity":"yii\web\User"')['username']
-            .'/title/'.$model->title_img;
-        $model->log = "/uploads/".Yii::$app->user->getIdentity('"_identity":"yii\web\User"')['username']
-            .'/logo/'.$model->logo;
-        $model->h5 = "/uploads/".Yii::$app->user->getIdentity('"_identity":"yii\web\User"')['username']
-            .'/h5/'.$model->h5;
 
         return $this->render('create', [
             'model' => $model,

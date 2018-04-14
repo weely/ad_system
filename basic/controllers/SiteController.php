@@ -10,17 +10,16 @@ use Yii;
 use yii\data\Pagination;
 use yii\filters\AccessControl;
 //use yii\web\Controller;
-use app\controllers\LoginCheckController as controller;
+use app\controllers\LoginCheckController as Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-
 use app\models\AdPlans;
 use app\models\Courses;
 use app\models\AdPlansSearch;
 use app\models\CoursesSearch;
-use app\components\UserAuthFilter as checkUser;
+//use app\components\UserAuthFilter as checkUser;
 
 class SiteController extends Controller
 {
@@ -75,7 +74,6 @@ class SiteController extends Controller
     {
         $user_id = Yii::$app->user->id;
         $request = Yii::$app->request;
-
 
         $page_size = isset($request->page_size) ? $request->page_size : 10;
         $page_num = isset($request->page_num) ? $request->page_num : 1;
@@ -367,9 +365,9 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
+//        if (!Yii::$app->user->isGuest) {
+//            return $this->goHome();
+//        }
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {

@@ -30,11 +30,11 @@ $this->context->layout = false;
 <!--                TODO 展示待确定-->
                 <div style="">
                     <h4 style="text-align: center">广告位预览</h4>
+                    <?php if ($item['is_h5']=='0'): ?>
                     <div id="sc_preview" style="background: rgba(42,171,210,0.24);padding: 10px;margin-left: 42px;margin-right: 42px;" class="row">
                         <h5><?=$item['ad_sc_title']?></h5>
                         <div class="col-lg-3" style="padding: 0px;">
-                            <img src="<?php echo "/uploads/".Yii::$app->user->getIdentity('"_identity":"yii\web\User"')['username']
-                                .'/logo/'.$item['logo']; ?>" style="width: 70px;height: 70px;"></div>
+                            <img src="<?php echo $item['logo']; ?>" style="width: 70px;height: 70px;"></div>
                         <div class="col-lg-9">
                             <div>
                                 <?php foreach (explode(',',$item['properties']) as $tag): ?>
@@ -52,6 +52,11 @@ $this->context->layout = false;
                             </div>
                         </div>
                     </div>
+                    <?php elseif($item['is_h5']=='1'): ?>
+                        <div style="margin-left: 42px;margin-right: 42px;">
+                            <img src="<?php echo $item['title_img'];?>" style="width: 270px;height: 150px;">
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div style="text-align: center">
                     <h4>H5预览</h4>

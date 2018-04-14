@@ -87,9 +87,9 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-//        return static::findOne(['access_token' => $token]);
-//        return static::findOne($token);
         return static::findOne(['access_token' => $token]);
+//        return static::findOne($token);
+//        return static::findOne(['token' => $token]);
     }
 
     /**
@@ -144,6 +144,7 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
      */
     public function validatePassword($password)
     {
+//        return $this->password === md5($password);
         return $this->password === $password;
     }
 }

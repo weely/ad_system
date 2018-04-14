@@ -7,42 +7,31 @@ use yii\widgets\ActiveForm;
 /* @var $model app\models\Courses */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+
 <script>
     $(function(){
-        // console.log($("input[name='radio_title']:checked").val());
-        if ($("input[name='radio_title']:checked").val()=='wz'){
+        if ($("input[name='is_h5']:checked").val()=='0'){
             $("#is_show").css('display','');
             $("#upload-tp-title").css('display','none');
-            // $("#tp_title").css('display','none');
-            // $("#wz_title").css('display','');
-            // $("#tp_title").attr("disabled",true);
-            // $("#wz_title").attr("disabled",true);
-            // $("#wz_title").removeAttr("disabled");
-        } else if($("input[name='radio_title']:checked").val()=='tp'){
+            $("#sc_preview_wz").css('display','');
+            $("#sc_preview_tp").css('display','none');
+        } else if($("input[name='is_h5']:checked").val()=='1'){
             $("#is_show").css('display','none');
             $("#upload-tp-title").css('display','');
-            // $("#tp_title").css('display','');
-            // $("#wz_title").css('display','none');
-            // $("#wz_title").attr("disabled",true);
-            // $("#tp_title").attr("disabled",true);
-            // $("#tp_title").removeAttr("disabled");
+            $("#sc_preview_wz").css('display','none');
+            $("#sc_preview_tp").css('display','');
         }
-        $("input[name='radio_title']").click(function(){
-            if ($(this).val() == 'wz'){
+        $("input[name='is_h5']").click(function(){
+            if ($(this).val() == '0'){
                 $("#is_show").css('display','');
                 $("#upload-tp-title").css('display','none');
-                // $("#tp_title").css('display','none');
-                // $("#wz_title").css('display','');
-                // $("#tp_title").attr("disabled",true);
-                // $("#wz_title").removeAttr("disabled");
-            } else if ($(this).val() == 'tp') {
+                $("#sc_preview_wz").css('display','');
+                $("#sc_preview_tp").css('display','none');
+            } else if ($(this).val() == '1') {
                 $("#is_show").css('display','none');
                 $("#upload-tp-title").css('display','');
-                // $("#tp_title").css('display','');
-                // $("#wz_title").css('display','none');
-                // $("#wz_title").attr("disabled",true);
-                // $("#tp_title").removeAttr("disabled");
+                $("#sc_preview_wz").css('display','none');
+                $("#sc_preview_tp").css('display','');
             }
         });
         // $("input[name='is_online']").click(function(){
@@ -71,7 +60,11 @@ use yii\widgets\ActiveForm;
                 processData: false,
                 success: function (data) {
                     if (data.status == "true") {
-                        alert(data.msg);
+                        // alert(data.msg);
+                        // $("input[name='title_img']").val(data.msg.slice(0,-4));
+                        // $("#img_title_src").attr('src', data.msg.slice(0,-4));
+                        $("input[name='title_img']").val(data.msg);
+                        $("#img_title_src").attr('src', data.msg);
                     }
                     if (data.status == "error") {
                         alert(data.msg);
@@ -104,8 +97,11 @@ use yii\widgets\ActiveForm;
                 processData: false,
                 success: function (data) {
                     if (data.status == "true") {
-                        alert(data.msg);
-                        // $("#file-logo-upload").val(data.msg);
+                        // alert(data.msg);
+                        // $("input[name='logo']").val(data.msg.slice(0,-4));
+                        // $("#img_logo_src").attr('src', data.msg.slice(0,-4));
+                        $("input[name='logo']").val(data.msg);
+                        $("#img_logo_src").attr('src', data.msg);
                     }
                     if (data.status == "error") {
                         alert(data.msg);
@@ -139,6 +135,7 @@ use yii\widgets\ActiveForm;
                 success: function (data) {
                     if (data.status == "true") {
                         alert(data.msg);
+                        // $("input[name='edit']").val(data.msg.slice(0,-4));
                         // $("#file-edit-upload").val(data.msg);
                     }
                     if (data.status == "error") {
@@ -173,7 +170,10 @@ use yii\widgets\ActiveForm;
                 success: function (data) {
                     if (data.status == "true") {
                         // $("#modal-body").val(data.msg);
-                        alert(data.msg);
+                        // alert(data.msg);
+                        // $("input[name='img_html']").val(data.msg.slice(0,-4));
+                        $("input[name='img_html']").val(data.msg);
+                        $("#img_img_html_src").attr('src', data.msg);
                     }
                     if (data.status == "error") {
                         // $("#modal-body").val(data.msg);
@@ -205,10 +205,13 @@ use yii\widgets\ActiveForm;
             $("#title").focus();
             return false;
         }
-        if ($("input[name='radio_title']:checked").val()=='wz'){
-            if ($("#type_tags").val() == '' || $("#type_tags").val().length>26) {
+
+        // alert(typeof($("input[name='logo'][2]").val()) == 'undefined')
+
+        if ($("input[name='is_h5']:checked").val()=='0'){
+            if ($("#properties").val() == '' || $("#properties").val().length>26) {
                 alert("！输入广告特点不符要求");
-                $("#type_tags").focus();
+                $("#properties").focus();
                 return false;
             }
             if ($("#tags").val() == '' || $("#tags").val().length>26) {
@@ -216,7 +219,22 @@ use yii\widgets\ActiveForm;
                 $("#tags").focus();
                 return false;
             }
+
+            if ($("input[name='logo']").val() == '' || typeof($("input[name='logo']").val()) == 'undefined') {
+                alert("！请上传LOGO");
+                $("#file-logo-upload").focus();
+                return false;
+            }
         }
+        if ($("input[name='is_h5']:checked").val()=='1'){
+            if ($("input[name='title_img']").val() == '' || typeof($("input[name='title_img']").val()) == 'undefined') {
+                alert("！请上传图片素材");
+                $("#file-logo-upload").focus();
+                return false;
+            }
+        }
+
+
         return true;
     }
 </script>
@@ -237,29 +255,8 @@ use yii\widgets\ActiveForm;
 
     <div class="form-group">
         <label class="form-label col-lg-3">广告标题:</label>
-        <div class="col-lg-9">
-            <div class="form-group">
-                <label class="form-label col-lg-2">
-                    <input type="radio" name="radio_title" value="wz" checked>文字</label>
-                <label class="form-label col-lg-2">
-                    <input type="radio" name="radio_title" value="tp" <?php echo $model->is_h5=='1' ? 'checked' : '' ?>>图片</label>
-                <div class="col-lg-9" >
-                    <input type="text" id="title" value="<?=$model['ad_sc_title']?>" name="sc_title" placeholder="请输入标题" class="form-control">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-lg-8" id="upload-tp-title" style="display: none">
-                    <div style="position: relative;">
-                        <input type="button" value="上传" id="upload-title-img" class="btn btn-default" style="display: block;
-                        position: absolute;z-index: 1;">
-                        <input type="file" id="file-title-upload" name="title_img" value="<?=$model['title_img']?>" style="display: none;position: absolute;z-index: 5;opacity:0;">
-                    </div>
-                    <span class="col-lg-offset-2" style="color: #365550;font-size: small">png、jpg格式,710px*220px,大小不超过100k</span>
-                </div>
-            </div>
-            <div class="form-group" >
-
-            </div>
+        <div class="col-lg-9" >
+            <input type="text" id="title" value="<?=$model['ad_sc_title']?>" name="sc_title" placeholder="请输入标题" class="form-control">
         </div>
     </div>
     <div class="form-group">
@@ -270,21 +267,50 @@ use yii\widgets\ActiveForm;
                     <input type="radio" name="is_online" value="1" <?php echo explode(',', $model['properties'])[0] == '线上'?'checked':''; ?>>线上</label>
             </div>
             <div class="form-group">
-                <label class="form-label col-lg-2"><input type="radio" name="is_online" value="0" <?php echo explode(',', $model['properties'])[0] == '线下'?'checked':''; ?>>线下</label>
-<!--                <div class="col-lg-4">-->
-<!--                    <select id="sel_addr" name="sel_addr" class="form-control">-->
-<!--                        <option value="1">北京</option>-->
-<!--                    </select>-->
-<!--                </div>-->
+                <label class="form-label col-lg-2">
+                    <input type="radio" name="is_online" value="0" <?php echo explode(',', $model['properties'])[0] == '线下'?'checked':''; ?>>线下</label>
             </div>
         </div>
     </div>
+    <div class="form-group">
+        <label class="form-label col-lg-3">Card类型:</label>
+        <div class="col-lg-9">
+            <div class="form-group">
+                <label class="form-label col-lg-2">
+                    <input type="radio" name="is_h5" value="0" checked>文字</label>
+                <label class="form-label col-lg-2">
+                    <input type="radio" name="is_h5" value="1" <?php echo $model->is_h5=='1' ? 'checked' : '' ?>>图片</label>
+                <div class="col-lg-8" id="upload-tp-title" style="display: none">
+                    <div style="position: relative;">
+                        <input type="button" value="上传" id="upload-title-img" class="btn btn-default" style="display: block;
+                        position: absolute;z-index: 1;">
+                        <input type="file" id="file-title-upload" style="display: none;position: absolute;z-index: 5;opacity:0;">
+                        <input type="hidden" name="title_img" value="<?=$model['title_img']?>">
+                    </div>
+                    <span class="col-lg-offset-2" style="color: #365550;font-size: 12px;">png、jpg格式,710px*220px,大小不超过100k</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    <div class="form-group">-->
+<!--        <label class="form-label col-lg-3">广告种类:</label>-->
+<!--        <div class="col-lg-9">-->
+<!--            <div class="form-group">-->
+<!--                <div class="col-lg-4">-->
+<!--                    <select id="tag_ids" name="tag_ids" class="form-control">-->
+<!--                        <option value="1">北京</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
     <div id="is_show" style="display: none;">
         <div class="form-group">
             <label class="form-label col-lg-3">广告特点:</label>
             <div class="col-lg-9">
                 <div class="form-group">
-                    <input type="text" id="type_tags" name="type_tags" value="<?=$model['properties']?>" placeholder="例如：线上,80课时" class="form-control">
+                    <input type="text" id="properties" name="properties" value="<?=$model['properties']?>" placeholder="例如：线上,80课时" class="form-control">
                     <span style="color: #365550;font-size: small">2-3个标签，用英文格式的逗号','隔开，单个标签不超过8个字符</span>
                 </div>
             </div>
@@ -308,7 +334,8 @@ use yii\widgets\ActiveForm;
                     <div style="position: relative;">
                         <input type="button" value="上传" id="upload-logo" class="btn btn-default" style="display: block;
                         position: absolute;z-index: 1;">
-                        <input type="file" id="file-logo-upload" name="logo" value="<?=$model['logo']?>" style="display: none;position: absolute;z-index: 5;opacity:0;">
+                        <input type="file" id="file-logo-upload" style="display: none;position: absolute;z-index: 5;opacity:0;">
+                        <input type="hidden" name="logo" value="<?=$model['logo']?>">
                     </div>
                     <span class="col-lg-offset-2" style="color: #365550;font-size: small">png、jpg格式,710px*220px,大小不超过100k</span>
                 </div>
@@ -319,7 +346,7 @@ use yii\widgets\ActiveForm;
         <label class="form-label col-lg-3">H5:</label>
         <div class="col-lg-9">
         <!--            <div class="form-group">-->
-        <!--                <label class="form-label col-lg-3"><input type="radio" name="is_h5" value="0" checked>副文本编辑框</label>-->
+        <!--                <label class="form-label col-lg-3"><input type="radio" name="" value="0" checked>副文本编辑框</label>-->
         <!--                <input type="button" value="上传" class="btn btn-default">-->
         <!--                <div class="col-lg-3" style="position: relative;">-->
         <!--                    <input type="button" value="上传" id="upload-edit" class="btn btn-default" style="display: block;-->
@@ -328,12 +355,14 @@ use yii\widgets\ActiveForm;
         <!--                </div>-->
         <!--            </div>-->
             <div class="form-group">
-                <label class="form-label col-lg-3"><input type="radio" name="is_h5" value="1">H5源文件</label>
-<!--                <input type="button" value="上传" class="btn btn-default">-->
+                <label class="form-label col-lg-3">
+                    <input type="radio" name="h5" value="1">
+                    H5源文件</label>
                 <div class="col-lg-3" style="position: relative;">
                     <input type="button" value="上传" id="upload-H5" class="btn btn-default" style="display: block;
                     position: absolute;z-index: 1;">
-                    <input type="file" id="file-H5-upload" name="img_html" value="<?=$model['img_html']?>" style="display: none;position: absolute;z-index: 5;opacity:0;">
+                    <input type="file" id="file-H5-upload" style="display: none;position: absolute;z-index: 5;opacity:0;">
+                    <input type="hidden" name="img_html" value="<?=$model['img_html']?>">
                 </div>
             </div>
         </div>
@@ -351,10 +380,10 @@ use yii\widgets\ActiveForm;
 <div class="col-lg-3">
     <div>
         <h4 style="text-align: center">广告位预览</h4>
-        <div id="sc_preview" style="background: rgba(42,171,210,0.24);padding: 10px;" class="row">
+        <div id="sc_preview_wz" style="background: rgba(42,171,210,0.24);padding: 10px;" class="row">
             <h5><?=$model['ad_sc_title']?></h5>
             <div class="col-lg-3" style="padding: 0px;">
-                <img src="<?php echo $model->logo; ?>" style="width: 70px;height: 70px;"></div>
+                <img id="img_logo_src" src="<?php echo $model['logo'];?>" style="width: 70px;height: 70px;"></div>
             <div class="col-lg-9">
                 <div>
                     <?php foreach (explode(',',$model['properties']) as $tag): ?>
@@ -371,6 +400,9 @@ use yii\widgets\ActiveForm;
                     <span style="border:1px solid #4ba7f4;color: #4ba7f4;font-size: 14px;">智联教育</span>
                 </div>
             </div>
+        </div>
+        <div id="sc_preview_tp" style="display: none">
+            <img id="img_title_src" src="<?php echo $model['title_img'];?>" style="width: 270px;height: 150px;">
         </div>
     </div>
 <!--    <div id="sc_html" style="text-align: center">-->

@@ -11,7 +11,7 @@ use app\models\AdPlansSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 //use yii\web\Controller;
-use app\controllers\LoginCheckController as controller;
+use app\controllers\LoginCheckController as Controller;
 /**
  * AdPlansController implements the CRUD actions for AdPlans model.
  */

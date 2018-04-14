@@ -58,8 +58,8 @@ class Courses extends \yii\db\ActiveRecord
             [['plan_id'], 'required'],
             [['tf_type', 'is_online', 'is_h5'], 'string'],
             [['create_at', 'update_at'], 'safe'],
-            [['title_img', 'ad_type'], 'string', 'max' => 20],
-            [['ad_sc_title', 'properties', 'tags'], 'string', 'max' => 50],
+            [['title_img', 'ad_sc_title', 'properties', 'tags'], 'string', 'max' => 50],
+            [['ad_type'], 'string', 'max' => 20],
             [['tag_ids'], 'string', 'max' => 30],
             [['logo', 'img_html', 'zhaopin_card', 'highpin_card', 'zhaopin_html', 'message_text'], 'string', 'max' => 100],
         ];
