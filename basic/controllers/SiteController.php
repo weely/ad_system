@@ -75,8 +75,8 @@ class SiteController extends Controller
         $user_id = Yii::$app->user->id;
         $request = Yii::$app->request;
 
-        $page_size = isset($request->page_size) ? $request->page_size : 10;
-        $page_num = isset($request->page_num) ? $request->page_num : 1;
+//        $page_size = isset($request->page_size) ? $request->page_size : 10;
+//        $page_num = isset($request->page_num) ? $request->page_num : 1;
 
         $plan_id = $request->get('plan_id');
         $c_id = $request->get('c_id');
@@ -158,23 +158,28 @@ class SiteController extends Controller
 //            ->orderBy('date_at')
 //            ->asArray()
 //            ->all();
-        $totalCount = HisUserData::find()
+//        $totalCount = HisUserData::find()
+//            ->select($his_sql_sel)
+//            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
+//            ->where($hdParams)
+//            ->groupBy($htgpParams)->count();
+//        $page_num = max(min(ceil($totalCount/$page_size), $page_num),1);
+
+        $dataQuery = HisUserData::find()
             ->select($his_sql_sel)
             ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
             ->where($hdParams)
-            ->groupBy($htgpParams)->count();
-        $page_num = max(min(ceil($totalCount/$page_size), $page_num),1);
-        $hisDatas = HisUserData::find()
-            ->select($his_sql_sel)
-            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
-            ->where($hdParams)
-            ->groupBy($htgpParams)
-            ->orderBy($order_value, $order_type)
-            ->limit($page_size)
-            ->offset(($page_num-1)*$page_size)
+            ->groupBy($htgpParams);
+        $page = new Pagination([
+            'defaultPageSize' => 10,
+            'totalCount' => $dataQuery->count(),
+        ]);
+
+        $hisDatas = $dataQuery->orderBy($order_value, $order_type)
+            ->offset($page->offset)
+            ->limit($page->limit)
             ->asArray()
             ->all();
-
 
         $sumClick = 0;
         $sumbook = 0;
@@ -217,146 +222,146 @@ class SiteController extends Controller
             'sel_course' => $c_id,
             'courses' => $userCourses,
             'data' => $datas,
-            'page_num' => $page_num,
-            'page_size' => ceil($totalCount/$page_size)
+            'page' => $page
         ]);
     }
 
-    public function actionUserDatas() {
-        $user_id = Yii::$app->user->id;
-        $request = Yii::$app->request;
-
-
-        $page_size = isset($request->page_size) ? $request->page_size : 10;
-        $page_num = isset($request->page_num) ? $request->page_num : 1;
-//        var_dump($page_size);
-//        return;
-
-
-        $plan_id = $request->get('plan_id');
-        $c_id = $request->get('c_id');
-
-        $begin_time = $request->get('begin_time');
-        $end_time = $request->get('end_time');
-
-        $order_value = $request->get('order_value') ?: 'date_at';
-        //1-> asc, 0->desc;
-        $order_type = $request->get('order_value') && $request->get('order_value')==1  ? 'ASC' : 'DESC';
-        $apQuery = AdPlans::find();
-        $cQuery = Courses::find();
-        /*参数字段*/
-        $aPparams = ['user_id'=>$user_id];              //广告计划查询参数
-        $cParams = ['user_id'=>$user_id];               //广告素材查询参数
-        $tdParams = ['user_id' => $user_id];            //当天数据查询参数
-        $hdParams = ['user_id' => $user_id];            //历史数据查询参数
-        $tgpParams = 'user_data.user_id';
-        $htgpParams = '';              //历史数据分组参数
-
-        if (!$plan_id && !$c_id){
-            $his_sql_sel = 'his_user_data.user_id as id,';
-        }
-        if ($plan_id) {
-            $aPparams['id'] = $plan_id;
-            $cParams['plan_id'] = $plan_id;
-            $tdParams['plan_id'] = $plan_id;
-            $hdParams['plan_id'] = $plan_id;
-            $tgpParams = $tgpParams. ',user_data.plan_id';
-//            $htgpParams = $htgpParams. ',his_user_data.plan_id';
-            $htgpParams = 'his_user_data.plan_id';
-
-            $his_sql_sel = 'his_user_data.plan_id as id,';
-            $htgpParams = "his_user_data.plan_id";
-        }
-        if ($c_id) {
-            $cParams['id'] = $c_id;
-            $tdParams['course_id'] = $c_id;
-            $hdParams['course_id'] = $c_id;
-            $tgpParams = $tgpParams. ',user_data.course_id';
-//            $htgpParams = $htgpParams. ',his_user_data.course_id';
-            $htgpParams = 'his_user_data.course_id';
-
-            $his_sql_sel = 'his_user_data.course_id as id,';
-            $htgpParams = "his_user_data.course_id";
-        }
-
-        $his_sql_sel .= ',sum(h.show) as show_num, sum(h.view) as click_num,sum(h.book) as book_num,
-                his_user_data.date_at';
-        $htgpParams .= ',his_user_data.date_at';
-
-        $choosePlans = $apQuery->where($aPparams)->orderBy('id')->all();
-        $chooseCourses = $cQuery->where($cParams)->orderBy('id')->all();
-
-        $todayDatas = UserData::find()
-            ->select('user_data.id,sum(h.show) as "show_num", sum(h.view) as click_num,sum(h.book) as book_num,
-                user_data.date_at')
-            ->leftJoin('hours as h', 'h.`cid`=`user_data`.`course_id`')
-            ->where($tdParams)
-            ->groupBy($tgpParams)
-            ->orderBy('create_at')
-            ->asArray()
-            ->all();
-
-//        $page = new Pagination(['totalCount' => ]);
-
+//    public function actionUserDatas() {
+//        $user_id = Yii::$app->user->id;
+//        $request = Yii::$app->request;
+//
+//
+//        $page_size = isset($request->page_size) ? $request->page_size : 10;
+//        $page_num = isset($request->page_num) ? $request->page_num : 1;
+////        var_dump($page_size);
+////        return;
+//
+//
+//        $plan_id = $request->get('plan_id');
+//        $c_id = $request->get('c_id');
+//
+//        $begin_time = $request->get('begin_time');
+//        $end_time = $request->get('end_time');
+//
+//        $order_value = $request->get('order_value') ?: 'date_at';
+//        //1-> asc, 0->desc;
+//        $order_type = $request->get('order_value') && $request->get('order_value')==1  ? 'ASC' : 'DESC';
+//        $apQuery = AdPlans::find();
+//        $cQuery = Courses::find();
+//        /*参数字段*/
+//        $aPparams = ['user_id'=>$user_id];              //广告计划查询参数
+//        $cParams = ['user_id'=>$user_id];               //广告素材查询参数
+//        $tdParams = ['user_id' => $user_id];            //当天数据查询参数
+//        $hdParams = ['user_id' => $user_id];            //历史数据查询参数
+//        $tgpParams = 'user_data.user_id';
+//        $htgpParams = '';              //历史数据分组参数
+//
+//        if (!$plan_id && !$c_id){
+//            $his_sql_sel = 'his_user_data.user_id as id,';
+//        }
+//        if ($plan_id) {
+//            $aPparams['id'] = $plan_id;
+//            $cParams['plan_id'] = $plan_id;
+//            $tdParams['plan_id'] = $plan_id;
+//            $hdParams['plan_id'] = $plan_id;
+//            $tgpParams = $tgpParams. ',user_data.plan_id';
+////            $htgpParams = $htgpParams. ',his_user_data.plan_id';
+//            $htgpParams = 'his_user_data.plan_id';
+//
+//            $his_sql_sel = 'his_user_data.plan_id as id,';
+//            $htgpParams = "his_user_data.plan_id";
+//        }
+//        if ($c_id) {
+//            $cParams['id'] = $c_id;
+//            $tdParams['course_id'] = $c_id;
+//            $hdParams['course_id'] = $c_id;
+//            $tgpParams = $tgpParams. ',user_data.course_id';
+////            $htgpParams = $htgpParams. ',his_user_data.course_id';
+//            $htgpParams = 'his_user_data.course_id';
+//
+//            $his_sql_sel = 'his_user_data.course_id as id,';
+//            $htgpParams = "his_user_data.course_id";
+//        }
+//
+//        $his_sql_sel .= ',sum(h.show) as show_num, sum(h.view) as click_num,sum(h.book) as book_num,
+//                his_user_data.date_at';
+//        $htgpParams .= ',his_user_data.date_at';
+//
+//        $choosePlans = $apQuery->where($aPparams)->orderBy('id')->all();
+//        $chooseCourses = $cQuery->where($cParams)->orderBy('id')->all();
+//
+//        $todayDatas = UserData::find()
+//            ->select('user_data.id,sum(h.show) as "show_num", sum(h.view) as click_num,sum(h.book) as book_num,
+//                user_data.date_at')
+//            ->leftJoin('hours as h', 'h.`cid`=`user_data`.`course_id`')
+//            ->where($tdParams)
+//            ->groupBy($tgpParams)
+//            ->orderBy('create_at')
+//            ->asArray()
+//            ->all();
+//
+////        $page = new Pagination(['totalCount' => ]);
+//
+////        $hisDatas = HisUserData::find()
+////            ->select($his_sql_sel)
+////            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
+////            ->where($hdParams)
+////            ->groupBy($htgpParams)
+////            ->orderBy($order_value, $order_type)
+////            ->asArray()
+////            ->all();
+//        $totalCount = HisUserData::find()
+//            ->select($his_sql_sel)
+//            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
+//            ->where($hdParams)
+//            ->groupBy($htgpParams)->count();
+//        $page_num = max(min(ceil($totalCount/$page_size), $page_num),1);
 //        $hisDatas = HisUserData::find()
 //            ->select($his_sql_sel)
 //            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
 //            ->where($hdParams)
 //            ->groupBy($htgpParams)
 //            ->orderBy($order_value, $order_type)
+//            ->limit($page_size)
+//            ->offset(($page_num-1)*$page_size)
 //            ->asArray()
 //            ->all();
-        $totalCount = HisUserData::find()
-            ->select($his_sql_sel)
-            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
-            ->where($hdParams)
-            ->groupBy($htgpParams)->count();
-        $page_num = max(min(ceil($totalCount/$page_size), $page_num),1);
-        $hisDatas = HisUserData::find()
-            ->select($his_sql_sel)
-            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
-            ->where($hdParams)
-            ->groupBy($htgpParams)
-            ->orderBy($order_value, $order_type)
-            ->limit($page_size)
-            ->offset(($page_num-1)*$page_size)
-            ->asArray()
-            ->all();
-
-        //var_dump($hisDatas);
-        //return;
-
-        $sumClick = 0;
-        $sumbook = 0;
-        $sumshow = 0;
-        $sumClickRate = 0;
-        $sumBookRate = 0;
-        $resHisData = [];
-        foreach ($hisDatas as $hisData) {
-            $hisData['click_rate'] = round(($hisData['show_num']>0 ? $hisData['click_num'] / $hisData['show_num'] : 0),4)*100 . '%';
-            $hisData['book_rate'] = round(($hisData['show_num']>0 ? $hisData['book_num'] / $hisData['show_num'] : 0),4)*100 .'% ';
-            // TODO 日消耗暂时未计算
-            $hisData['day_cost'] = 0;
-            $sumshow +=  $hisData['show_num'];
-            $sumbook +=  $hisData['book_num'];
-            $sumClick +=  $hisData['click_num'];
-            $resHisData[] = $hisData;
-        }
-        $sumClickRate = round(($sumshow>0 ? $sumClick/$sumshow : 0),4)*100 . '%';
-        $sumBookRate = round(($sumshow>0 ? $sumbook/$sumshow : 0),4)*100 . '%';
-        // TODO 日消耗暂时未计算
-        $sumDatas = ['总计', $sumshow, $sumClick, $sumClickRate, $sumbook, $sumBookRate, 0];
-
-        $datas = [
-            'today_data' => $todayDatas,
-            'his_data' => $resHisData,
-            'sum_data' => $sumDatas,
-            'page_num' => $page_num,
-            'page_size' => ceil($totalCount/$page_size)
-        ];
-        Yii::$app->response->format=Response::FORMAT_JSON;
-        return ['data' => $datas];
-    }
+//
+//        //var_dump($hisDatas);
+//        //return;
+//
+//        $sumClick = 0;
+//        $sumbook = 0;
+//        $sumshow = 0;
+//        $sumClickRate = 0;
+//        $sumBookRate = 0;
+//        $resHisData = [];
+//        foreach ($hisDatas as $hisData) {
+//            $hisData['click_rate'] = round(($hisData['show_num']>0 ? $hisData['click_num'] / $hisData['show_num'] : 0),4)*100 . '%';
+//            $hisData['book_rate'] = round(($hisData['show_num']>0 ? $hisData['book_num'] / $hisData['show_num'] : 0),4)*100 .'% ';
+//            // TODO 日消耗暂时未计算
+//            $hisData['day_cost'] = 0;
+//            $sumshow +=  $hisData['show_num'];
+//            $sumbook +=  $hisData['book_num'];
+//            $sumClick +=  $hisData['click_num'];
+//            $resHisData[] = $hisData;
+//        }
+//        $sumClickRate = round(($sumshow>0 ? $sumClick/$sumshow : 0),4)*100 . '%';
+//        $sumBookRate = round(($sumshow>0 ? $sumbook/$sumshow : 0),4)*100 . '%';
+//        // TODO 日消耗暂时未计算
+//        $sumDatas = ['总计', $sumshow, $sumClick, $sumClickRate, $sumbook, $sumBookRate, 0];
+//
+//        $datas = [
+//            'today_data' => $todayDatas,
+//            'his_data' => $resHisData,
+//            'sum_data' => $sumDatas,
+//            'page_num' => $page_num,
+//            'page_size' => ceil($totalCount/$page_size)
+//        ];
+//        Yii::$app->response->format=Response::FORMAT_JSON;
+//        return ['data' => $datas];
+//    }
+//
 
     /**
      * Login action.
@@ -377,24 +382,25 @@ class SiteController extends Controller
             'model' => $model,
         ]);
 
-//        $model = new LoginForm();
-//        if (strtoupper($_SERVER['REQUEST_METHOD']) === 'GET') {
-//            return $this->render('login',[
-//                'model' => $model,
-//            ]);
-//        } else if (strtoupper($_SERVER['REQUEST_METHOD']) === 'POST') {
-//            $request = Yii::$app->request;
-//            $password = $request->post('LoginForm')['password'];
-//            if ($model->load(Yii::$app->request->post()) && $model->login($password)) {
-//                echo $password;
-//                var_dump($model);
-//
-//                return $this->goBack();
-//            }
-//        }
-//        return $this->render('login',[
-//            'model' => $model,
-//        ]);
+        /*
+        $model = new LoginForm();
+        if (strtoupper($_SERVER['REQUEST_METHOD']) === 'GET') {
+            return $this->render('login',[
+                'model' => $model,
+            ]);
+        } else if (strtoupper($_SERVER['REQUEST_METHOD']) === 'POST') {
+            $request = Yii::$app->request;
+            $password = $request->post('LoginForm')['password'];
+            if ($model->load(Yii::$app->request->post()) && $model->login($password)) {
+                echo $password;
+                var_dump($model);
+
+                return $this->goBack();
+            }
+        }
+        return $this->render('login',[
+            'model' => $model,
+        ]);*/
     }
 
     /**
@@ -445,26 +451,30 @@ class SiteController extends Controller
             $adpParams['tf_type'] = $tf_type;
             $scParams['courses.tf_type'] = $tf_type;
         }
-        $adPlans = $adPQuery->where($adpParams)->orderBy('create_at')->all();
-        $adCourses= $scQuery->select('courses.*, ap.plan_name')
+        $adPQuery = $adPQuery->where($adpParams);
+        $scQuery= $scQuery->select('courses.*, ap.plan_name')
             ->leftJoin('ad_plans ap','ap.id=`courses`.`plan_id`')
-            ->where($scParams)->orderBy('create_at')->asArray()->all();
-
-//        var_dump($adCourses[0]['plan_name']);
-//
-//        return;
-        //        $res = [];
-        //foreach ($adPlans as $plan) {
-        //    $res['id'] = $plan->id;
-        //    $res['project_id'] = $plan->old_plan_id;
-        //    $res['tag_ids'] = $plan->tag_ids;
-        ////    $res['plan_name'] = $plan->plan_name;
-        //    $res['tf_status'] = $plan->tf_status;
-        //    $res['ty_type'] = $plan->tf_type;
-        //    $res['tf_period'] = $plan->tf_period;
-        //    $res['budget'] = $plan->budget;
-        //    $res['budget'] = $plan->budget;
-        //}
+            ->where($scParams)->orderBy('create_at');
+        $adPage = new Pagination([
+            'defaultPageSize' => 10,
+            'totalCount' => $adPQuery->count(),
+            'pageParam' => 'plan_page',
+//            'route' => '/index.php?r=site/ad-manage'
+        ]);
+        $scPage = new Pagination([
+            'defaultPageSize' => 10,
+            'totalCount' => $scQuery->count(),
+            'pageParam' => 'sucai_page',
+//            'route' => '/index.php?r=site/ad-manage'
+        ]);
+        $adPlans = $adPQuery->orderBy('create_at')
+            ->offset($adPage->offset)
+            ->limit($adPage->limit)
+            ->all();
+        $adCourses= $scQuery->orderBy('create_at')
+            ->offset($scPage->offset)
+            ->limit($scPage->limit)
+            ->asArray()->all();
 
         $datas = ['planTitles' => Yii::$app->params['planTitles'],
             'courseTitles' => Yii::$app->params['courseTitles'],
@@ -479,6 +489,8 @@ class SiteController extends Controller
         ];
         return $this->render('admanage',[
                 'data' => $datas,
+                'ad_page' => $adPage,
+                'sc_page' => $scPage,
             ]);
     }
 

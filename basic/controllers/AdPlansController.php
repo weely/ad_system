@@ -38,13 +38,6 @@ class AdPlansController extends Controller
      */
     public function actionIndex()
     {
-//        $searchModel = new AdPlansSearch();
-//        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-//
-//        return $this->render('planofcourses', [
-//            'searchModel' => $searchModel,
-//            'dataProvider' => $dataProvider,
-//        ]);
         return $this->redirect('index.php?r=site/ad-manage');
     }
 

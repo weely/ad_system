@@ -155,10 +155,7 @@ use yii\widgets\LinkPager;
                     </tbody>
                 </table>
             </div>
-            <?= LinkPager::widget(['pagination' => $ad_page,
-                'nextPageLabel' => '下一页',
-                'prevPageLabel' => '上一页',
-                ]) ?>
+            <?= LinkPager::widget(['pagination' => $ad_page]) ?>
         </div>
         <div role="tabpanel" class="tab-pane" id="sucai-panel">
             <br>
@@ -229,10 +226,7 @@ use yii\widgets\LinkPager;
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <?= LinkPager::widget(['pagination' => $sc_page,
-                'nextPageLabel' => '下一页',
-                'prevPageLabel' => '上一页',
-                ]) ?>
+            <?= LinkPager::widget(['pagination' => $sc_page]) ?>
         </div>
     </div>
     <!--modal-->

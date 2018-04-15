@@ -1,6 +1,7 @@
 <?php
 
 /* @var $this yii\web\View */
+use yii\widgets\LinkPager;
 
 $this->title = '竞价系统';
 ?>
@@ -255,7 +256,16 @@ $this->title = '竞价系统';
             </tbody>
         </table>
         </div>
-        <?php if($page_size>=1): ?>
+        <div style="position: relative;top: 150px;">
+        <?= LinkPager::widget(['pagination' => $page,
+            'nextPageLabel' => '下一页',
+            'prevPageLabel' => '上一页',
+            ]) ?>
+        </div>
+
+        <?php
+        /*
+        if($page_size>=1): ?>
         <div class="col-lg-offset-1" style="position: relative;top: 150px;">
             <nav aria-label="Page navigation">
                 <ul class="pagination">
@@ -278,6 +288,9 @@ $this->title = '竞价系统';
                 </ul>
             </nav>
         </div>
-        <?php endif ?>
+        <?php endif
+        */
+        ?>
+
     </form>
 </div>

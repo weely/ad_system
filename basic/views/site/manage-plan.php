@@ -72,24 +72,11 @@ use yii\widgets\LinkPager;
 
 </script>
 <div class="container">
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist" id="myTabs">
-        <li id="plan_li" role="presentation">
-            <a href="#plan-panel" aria-controls="plan" role="tab" data-toggle="tab">广告计划</a></li>
-<!--            <a href="/index.php?r=ad-plans" aria-controls="home" role="tab" data-toggle="tab">广告计划</a></li>-->
-        <li id='sucai_li' role="presentation">
-            <a href="#sucai-panel" aria-controls="sucai" role="tab" data-toggle="tab">广告素材</a></li>
-    </ul>
-    <!-- Tab panes -->
-    <div class="tab-content">
         <div role="tabpanel" class="tab-pane" id="plan-panel">
             <br>
             <div class="form-group col-lg-12">
                 <div class="col-lg-2">
                 <select class="form-control" id="tfStatus" onchange="selectByParams(this, 'status', 1)">
-<!--                    --><?php //foreach ($data['tf_status_select'] as $item) {
-//                            echo '<option value="' . $item['code'] .'">' . $item['value'] . "</option>";
-//                        }?>
                     <?php foreach ($data['tf_status_select'] as $item): ?>
                         <option value="<?php echo $item['code'];?>" <?php if ($item['code'] === $data['tf_status']) {echo 'selected="selected"';} ?> >
                             <?php echo $item['value']; ?>
@@ -155,10 +142,7 @@ use yii\widgets\LinkPager;
                     </tbody>
                 </table>
             </div>
-            <?= LinkPager::widget(['pagination' => $ad_page,
-                'nextPageLabel' => '下一页',
-                'prevPageLabel' => '上一页',
-                ]) ?>
+            <?= LinkPager::widget(['pagination' => $ad_page]) ?>
         </div>
         <div role="tabpanel" class="tab-pane" id="sucai-panel">
             <br>
@@ -229,10 +213,7 @@ use yii\widgets\LinkPager;
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <?= LinkPager::widget(['pagination' => $sc_page,
-                'nextPageLabel' => '下一页',
-                'prevPageLabel' => '上一页',
-                ]) ?>
+            <?= LinkPager::widget(['pagination' => $sc_page]) ?>
         </div>
     </div>
     <!--modal-->
