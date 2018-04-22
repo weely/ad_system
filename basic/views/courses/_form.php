@@ -170,7 +170,7 @@ use yii\widgets\ActiveForm;
                 success: function (data) {
                     if (data.status == "true") {
                         // $("#modal-body").val(data.msg);
-                        // alert(data.msg);
+                        alert("上传成功");
                         // $("input[name='img_html']").val(data.msg.slice(0,-4));
                         $("input[name='img_html']").val(data.msg);
                         $("#img_img_html_src").attr('src', data.msg);
@@ -206,8 +206,6 @@ use yii\widgets\ActiveForm;
             return false;
         }
 
-        // alert(typeof($("input[name='logo'][2]").val()) == 'undefined')
-
         if ($("input[name='is_h5']:checked").val()=='0'){
             if ($("#properties").val() == '' || $("#properties").val().length>26) {
                 alert("！输入广告特点不符要求");
@@ -233,7 +231,11 @@ use yii\widgets\ActiveForm;
                 return false;
             }
         }
-
+        if ($("input[name='img_html']").val() == '' || typeof($("input[name='img_html']").val()) == 'undefined') {
+            alert("！请上传落地页图片素材");
+            $("#file-H5-upload").focus();
+            return false;
+        }
 
         return true;
     }
@@ -268,7 +270,7 @@ use yii\widgets\ActiveForm;
             </div>
             <div class="form-group">
                 <label class="form-label col-lg-2">
-                    <input type="radio" name="is_online" value="0" <?php echo explode(',', $model['properties'])[0] == '线下'?'checked':''; ?>>线下</label>
+                    <input type="radio" name="is_online" value="0" <?php echo explode(',', $model['properties'])[0] == '线上'?'':'checked'; ?>>线下</label>
             </div>
         </div>
     </div>
@@ -345,15 +347,6 @@ use yii\widgets\ActiveForm;
     <div class="form-group">
         <label class="form-label col-lg-3">H5:</label>
         <div class="col-lg-9">
-        <!--            <div class="form-group">-->
-        <!--                <label class="form-label col-lg-3"><input type="radio" name="" value="0" checked>副文本编辑框</label>-->
-        <!--                <input type="button" value="上传" class="btn btn-default">-->
-        <!--                <div class="col-lg-3" style="position: relative;">-->
-        <!--                    <input type="button" value="上传" id="upload-edit" class="btn btn-default" style="display: block;-->
-        <!--                    position: absolute;z-index: 1;">-->
-        <!--                    <input type="file" id="file-edit-upload" name="edit_html" style="display: none;position: absolute;z-index: 5;opacity:0;">-->
-        <!--                </div>-->
-        <!--            </div>-->
             <div class="form-group">
                 <label class="form-label col-lg-3">
                     <input type="radio" name="h5" value="1">

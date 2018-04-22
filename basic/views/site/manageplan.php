@@ -72,24 +72,11 @@ use yii\widgets\LinkPager;
 
 </script>
 <div class="container">
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist" id="myTabs">
-        <li id="plan_li" role="presentation">
-            <a href="#plan-panel" aria-controls="plan" role="tab" data-toggle="tab">广告计划</a></li>
-<!--            <a href="/index.php?r=ad-plans" aria-controls="home" role="tab" data-toggle="tab">广告计划</a></li>-->
-        <li id='sucai_li' role="presentation">
-            <a href="#sucai-panel" aria-controls="sucai" role="tab" data-toggle="tab">广告素材</a></li>
-    </ul>
-    <!-- Tab panes -->
-    <div class="tab-content">
         <div role="tabpanel" class="tab-pane" id="plan-panel">
             <br>
             <div class="form-group col-lg-12">
                 <div class="col-lg-2">
                 <select class="form-control" id="tfStatus" onchange="selectByParams(this, 'status', 1)">
-<!--                    --><?php //foreach ($data['tf_status_select'] as $item) {
-//                            echo '<option value="' . $item['code'] .'">' . $item['value'] . "</option>";
-//                        }?>
                     <?php foreach ($data['tf_status_select'] as $item): ?>
                         <option value="<?php echo $item['code'];?>" <?php if ($item['code'] === $data['tf_status']) {echo 'selected="selected"';} ?> >
                             <?php echo $item['value']; ?>
@@ -156,77 +143,6 @@ use yii\widgets\LinkPager;
                 </table>
             </div>
             <?= LinkPager::widget(['pagination' => $ad_page]) ?>
-        </div>
-        <div role="tabpanel" class="tab-pane" id="sucai-panel">
-            <br>
-            <div class="form-group col-lg-12">
-                <div class="col-lg-2">
-                    <select class="form-control" id="ctfStatus" onchange="selectByParams(this, 'status', 0)">
-                        <?php foreach ($data['tf_status_select'] as $item): ?>
-                            <option value="<?php echo $item['code'];?>" <?php if ($item['code'] === $data['tf_status']) {echo 'selected="selected"';} ?> >
-                                <?php echo $item['value']; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-lg-2">
-                    <select class="form-control" id="ctfType" onchange="selectByParams(this, 'type', 0)">
-                        <?php foreach ($data['tf_type_select'] as $item): ?>
-                            <option value="<?php echo $item['code'];?>" <?php if ($item['code'] === $data['tf_type']) {echo 'selected="selected"';} ?> >
-                                <?php echo $item['value']; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-lg-3" style="display: inline-flex">
-                    <label>广告投放时间:</label>
-                    <input type="date" class="form-control">
-                </div>
-            </div>
-            <table class="table table-striped table-bordered">
-<!--                <caption style="background-color: #d2d2bb;">-->
-                <caption>
-                    <div class="col-lg-3">
-                        <a class="btn btn-info" href="/index.php?r=courses/create"><i class="glyphicon glyphicon-plus"></i>新建素材</a>
-                    </div>
-                    <div class="col-lg-offset-11">
-                        <label>合计-</label>
-                        <label><?php echo $data['sum_courses'] ?> </label>
-                        <!--                            <button class="btn btn-default">导出数据</button>-->
-                    </div>
-                </caption>
-                <thead>
-                <tr>
-                    <?php
-                    foreach($data['courseTitles'] as $title){
-                        echo "<th>" . $title  ."</th>";
-                    }
-                    ?>
-                </tr>
-                </thead>
-                <tbody id="courses">
-                <?php foreach ($data['ad_courses'] as $course): ?>
-                    <tr><td><?php echo $course['tf_status']; ?></td>
-                        <td><a href="/index.php?r=courses/view&id=<?php echo $course['id']; ?>" data-remote="false" data-toggle="modal" data-target="#data-modal" data-whatever="素材">
-                                <?php echo $course['ad_sc_title']; ?>
-                            </a></td>
-<!--                    <td><a href="/index.php?r=courses/view&id=--><?php //echo $course['id']; ?><!--">--><?php //echo $course['ad_sc_title']; ?><!--</a></td>-->
-                    <td><?php echo Yii::$app->params['tf_status'][$course['tf_status']]; ?></td>
-                    <td><?php echo $course['plan_name']; ?></td>
-<!--                    // TODO 计划详情等链接-->
-                    <td><a href="/index.php?r=courses/view&id=<?php echo $course['id']; ?>" data-remote="false" data-toggle="modal" data-target="#data-modal" data-whatever="素材">
-                            <span class="glyphicon glyphicon-eye-open"></span>
-                        </a>
-                        <a href="/index.php?r=courses/update&id=<?php echo $course['id']; ?>">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                        </a>
-                        <a href="/index.php?r=courses/delete&id=<?php echo $course['id']; ?>" data-confirm="您确认该计划删除吗？" data-method="post">
-                            <span class="glyphicon glyphicon-trash"></a></td>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-            <?= LinkPager::widget(['pagination' => $sc_page]) ?>
         </div>
     </div>
     <!--modal-->

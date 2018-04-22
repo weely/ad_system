@@ -22,8 +22,8 @@ strVarCity += "                   <div class=\"aui_iconBg\" style=\"background: 
 strVarCity += "                     <td class=\"aui_main\" style=\"width: auto; height: auto;\">";
 strVarCity += "                      <div class=\"aui_content\" style=\"padding: 0px; position:relative\">";
 strVarCity += "                        <div id=\"\" style=\"width: 900px; position:relative;\">";
-strVarCity += "                          <div class=\"data-result\"><em>最多选择 <strong>3<\/strong> 项<\/em><\/div>";
-strVarCity += "                          <div class=\"data-error\" style=\"display: none;\">最多只能选择 3 项<\/div>";
+strVarCity += "                          <div class=\"data-result\"><em>最多选择 <strong>10<\/strong> 项<\/em><\/div>";
+strVarCity += "                          <div class=\"data-error\" style=\"display: none;\">最多只能选择 10 项<\/div>";
 strVarCity += "                          <div class=\"data-tabs\">";
 strVarCity += "                            <ul>";
 strVarCity += "                              <li onclick=\"removenode_area(this)\" data-selector=\"tab-all\" class=\"active\"><a href=\"javascript:;\"><span>全部<\/span><em><\/em><\/a><\/li>";
@@ -204,7 +204,7 @@ function selectProvince(type, con, isremove) {
 function selectitem_area(con) {
     if (datatype == "duoxuan") {
         //多选
-        if ($('.data-result span').length > 2) {
+        if ($('.data-result span').length > 10) {
             $('.data-error').slideDown();
             setTimeout("$('.data-error').hide()", 1000);
             return false;

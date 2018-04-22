@@ -16,6 +16,8 @@ use Yii;
  * @property string $info_mobile
  * @property string $info_company
  * @property string $info_position
+ * @property string $info_city
+ * @property string $info_tags
  * @property int $flag 是否是韦博英语未提交的数据（0，是，1不是）
  * @property string $state 1:预约；2:点击；
  * @property string $create_at
@@ -37,14 +39,13 @@ class UserData extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['user_id', 'plan_id', 'course_id', 'date_at'], 'required'],
             [['user_id', 'plan_id', 'course_id'], 'integer'],
-            [['plan_id', 'date_at'], 'required'],
             [['state'], 'string'],
             [['create_at', 'date_at'], 'safe'],
-            [['info_name', 'info_mobile', 'info_company', 'info_position'], 'string', 'max' => 50],
+            [['info_name', 'info_mobile', 'info_company', 'info_position', 'info_city', 'info_tags'], 'string', 'max' => 50],
             [['info_gender'], 'string', 'max' => 3],
             [['flag'], 'string', 'max' => 1],
-            [['course_id', 'info_mobile'], 'unique', 'targetAttribute' => ['course_id', 'info_mobile']],
         ];
     }
 
@@ -63,14 +64,12 @@ class UserData extends \yii\db\ActiveRecord
             'info_mobile' => 'Info Mobile',
             'info_company' => 'Info Company',
             'info_position' => 'Info Position',
+            'info_city' => 'Info City',
+            'info_tags' => 'Info Tags',
             'flag' => 'Flag',
             'state' => 'State',
             'create_at' => 'Create At',
             'date_at' => 'Date At',
         ];
-    }
-
-    public function getHours() {
-        return $this->hasMany(Hours::className(), ['course_id' => 'cid']);
     }
 }

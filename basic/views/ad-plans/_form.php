@@ -100,13 +100,13 @@ use yii\widgets\ActiveForm;
         <input name="id" type="hidden" value="<?=$model->id?>">
         <!-- 第一页-->
         <div id="page1" style="margin-top: 100px;">
-            <div class="form-group">
-                <label class="form-label col-lg-2">广告计划编号:</label>
-                <div class="col-lg-8">
-                    <input type="text" id="plan-num" value="<?php echo $model->plan_number; ?>" name="plan_num" placeholder="请输入广告计划编号" class="form-control">
-                </div>
-<!--                <label style="color: gray;font-size: 12px;">字符不超过30个</label>-->
-            </div>
+<!--            <div class="form-group">-->
+<!--                <label class="form-label col-lg-2">广告计划编号:</label>-->
+<!--                <div class="col-lg-8">-->
+<!--                    <input type="text" id="plan-num" value="--><?php //echo $model->plan_number; ?><!--" name="plan_num" placeholder="请输入广告计划编号" class="form-control">-->
+<!--                </div>-->
+<!--<!--                <label style="color: gray;font-size: 12px;">字符不超过30个</label>-->
+<!--            </div>-->
             <div class="form-group">
                 <label class="form-label col-lg-2">广告计划名称:</label>
                 <div class="col-lg-8">
@@ -163,11 +163,11 @@ use yii\widgets\ActiveForm;
                 <div class="col-lg-8">
                     <div class="form-group">
                         <label class="form-label col-lg-2">
-                            <input type="radio" name="radio_date" value="-1" <?php echo $model->tf_date=='不限' ? 'checked':''; ?>>不限</label>
+                            <input type="radio" name="radio_date" value="-1" <?php echo $model->tf_date=='不限'||$model->tf_date==null ? 'checked':''; ?>>不限</label>
                     </div>
                     <div class="form-group">
                         <label class="form-label col-lg-3">
-                            <input type="radio" name="radio_date" value="1" <?php echo $model->tf_date=='不限' ? '':'checked'; ?>>自定义</label>
+                            <input type="radio" name="radio_date" value="1" <?php echo $model->tf_date=='不限'||$model->tf_date==null ? '':'checked'; ?>>自定义</label>
                         <div class="col-lg-4">
                             <input type="date" id="tf-date-begin" name="tf_date_begin" value="<?php
                                 echo substr($model->tf_date,0,strpos($model->tf_date, ',')); ?>" class="form-control">
@@ -185,11 +185,11 @@ use yii\widgets\ActiveForm;
                 <div class="col-lg-8">
                     <div class="form-group">
                         <label class="form-label col-lg-2">
-                            <input type="radio" name="radio_time" value="-1" <?php echo $model->tf_period=='不限' ? 'checked':''; ?>>不限</label>
+                            <input type="radio" name="radio_time" value="-1" <?php echo $model->tf_period=='不限'||$model->tf_period==null ? 'checked':''; ?>>不限</label>
                     </div>
                     <div class="form-group">
                         <label class="form-label col-lg-3">
-                            <input type="radio" name="radio_time" value="1" <?php echo $model->tf_period!='不限' ? 'checked':''; ?>>自定义</label>
+                            <input type="radio" name="radio_time" value="1" <?php echo $model->tf_period=='不限'||$model->tf_period==null ? '':'checked'; ?>>自定义</label>
                         <div class="col-lg-4">
                             <select id="opt-addr" name="tf_time_begin" class="form-control">
                             <?php foreach ($periods as $k => $v): ?>
@@ -214,11 +214,11 @@ use yii\widgets\ActiveForm;
                 <div class="col-lg-8">
                     <div class="form-group">
                         <label class="form-label col-lg-2">
-                            <input type="radio" name="radio_addr" value="-1" <?php echo $model->properties=='不限' ? 'checked':''; ?>>不限</label>
+                            <input type="radio" name="radio_addr" value="-1" <?php echo $model->properties=='不限'||$model->properties==null ? 'checked':''; ?>>不限</label>
                     </div>
                     <div class="form-group">
                         <label class="form-label col-lg-3">
-                            <input type="radio" name="radio_addr" value="1" <?php echo $model->properties=='不限' ? '':'checked'; ?>>自定义</label>
+                            <input type="radio" name="radio_addr" value="1" <?php echo $model->properties=='不限'||$model->properties==null ? '':'checked'; ?>>自定义</label>
                         <div class="col-lg-4">
                             <input type="text" name="opt_addr" class="form-control" value="<?php echo $model->properties; ?>" data-value="" placeholder="选择区域" onclick="appendCity(this,'duoxuan')" />
                         </div>
@@ -242,10 +242,10 @@ use yii\widgets\ActiveForm;
                 <div class="col-lg-8">
                     <div class="form-group">
                         <label class="form-label col-lg-2">
-                            <input type="radio" name="radio_age" value="-1" <?php echo $model->age=='不限' ?'checked':''; ?>>不限</label>
+                            <input type="radio" name="radio_age" value="-1" <?php echo $model->age=='不限'||$model->age==null ?'checked':''; ?>>不限</label>
                     </div>
                     <div class="form-group">
-                        <label class="form-label col-lg-3"><input type="radio" name="radio_age" value="1" <?php echo $model->age!='不限' ?'checked':''; ?>>自定义</label>
+                        <label class="form-label col-lg-3"><input type="radio" name="radio_age" value="1" <?php echo $model->age=='不限'||$model->age==null ?'':'checked'; ?>>自定义</label>
                         <div class="col-lg-4">
                             <select id="opt-age-start" name="opt_age_start" class="form-control">
                                 <?php foreach ($ages as $k=>$V): ?>
@@ -268,7 +268,7 @@ use yii\widgets\ActiveForm;
             <div class="form-group">
                 <label class="form-label col-lg-2">性别:</label>
                 <div class="col-lg-8 form-group">
-                    <label class="form-label col-lg-2"><input type="radio" name="radio_gender" value="0" <?php echo $model->sex=='0' ?'checked':''; ?>>不限</label>
+                    <label class="form-label col-lg-2"><input type="radio" name="radio_gender" value="0" <?php echo $model->sex=='0'||$model->sex==null ?'checked':''; ?>>不限</label>
                     <label class="form-label col-lg-2"><input type="radio" name="radio_gender" value="1" <?php echo $model->sex=='1' ?'checked':''; ?>>男</label>
                     <label class="form-label col-lg-2"><input type="radio" name="radio_gender" value="-1" <?php echo $model->sex=='-1' ?'checked':''; ?>>女</label>
                 </div>
@@ -279,11 +279,11 @@ use yii\widgets\ActiveForm;
                 <div class="col-lg-8">
                     <div class="form-group">
                         <label class="form-label col-lg-2">
-                            <input type="radio" name="radio_degree" value="-1" <?php echo $model->degree=='不限' ?'checked':''; ?>>不限</label>
+                            <input type="radio" name="radio_degree" value="-1" <?php echo $model->degree=='不限'||$model->degree==null ?'checked':''; ?>>不限</label>
                     </div>
                     <div class="form-group">
                         <label class="form-label col-lg-3">
-                            <input type="radio" name="radio_degree" value="1" <?php echo $model->degree!='不限' ?'checked':''; ?>>自定义</label>
+                            <input type="radio" name="radio_degree" value="1" <?php echo $model->degree=='不限'||$model->degree==null ?'':'checked'; ?>>自定义</label>
                         <div class="col-lg-4">
                             <select id="opt-degree-start" name="opt_degree_start" class="form-control">
                                 <?php foreach ($degrees as $k=>$V): ?>

@@ -7,21 +7,21 @@
 
 use yii\helpers\Html;
 
-$this->title = $name;
+$this->title = "错误提示页：";
 ?>
 <div class="site-error">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
+    <h2><?= Html::encode($this->title) ?></h2>
+    <br>
     <div class="alert alert-danger">
         <?= nl2br(Html::encode($message)) ?>
     </div>
 
+<!--    <p>-->
+<!--        提示：服务器处理请求过程中出现了以下错误:-->
+<!--    </p>-->
     <p>
-        The above error occurred while the Web server was processing your request.
-    </p>
-    <p>
-        Please contact us if you think this is a server error. Thank you.
+        出现未知错误，请联系管理员.
     </p>
 
 </div>

@@ -11,12 +11,10 @@ $this->title = 'Ad Plans';
 //$this->params['breadcrumbs'][] = $this->title;
 $this->context->layout = false;
 
-//var_dump($sucai_id);
-
 ?>
 <div class="ad-plans-index row">
     <div class="col-lg-4">
-        <ul id="" class="nav nav-tabs">
+        <ul id="" class="nav nav-pills nav-stacked"">
             <?php foreach ($courses as $item): ?>
                 <li class="<?php if($sucai_id == $item['id']){echo "active";} ?>">
                     <a href="#<?php echo $item['id']; ?>" role="tab" data-toggle="tab"><span><?php echo $item['id'].$item['ad_sc_title']; ?></span></a></li>

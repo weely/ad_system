@@ -67,8 +67,17 @@ class UserController extends Controller
     {
         $model = new User();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->username = trim($model->username);
+            $model->showname = trim($model->showname);
+            $model->password = $model->password;
+            $model->is_admin = $model->is_admin ?: 0;
+            $model->total_fund = $model->total_fund ?: 0;
+            $model->avail_fund = $model->avail_fund ?: 0;
+
+            if($model->save()){
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('create', [

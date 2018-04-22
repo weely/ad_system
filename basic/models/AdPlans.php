@@ -13,7 +13,7 @@ use Yii;
  * @property string $tag_ids 课程标签id
  * @property string $plan_number 计划编号
  * @property string $plan_name 计划名称
- * @property int $tf_status 投放状态：1、投放中，2、待投放。0、待审核
+ * @property string $tf_status 状态：1.开启;0.关闭;4.删除
  * @property string $tf_type 投放模式：1：CPM, 2: CPC, 3: CPA,4:CPL,5:CPS
  * @property int $tf_value 投放值
  * @property double $budget 每日预算
@@ -45,8 +45,8 @@ class AdPlans extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['old_plan_id', 'user_id', 'tf_status', 'tf_value', 'cpm', 'cpc', 'cps'], 'integer'],
-            [['tf_type', 'sex'], 'string'],
+            [['old_plan_id', 'user_id', 'tf_value', 'cpm', 'cpc', 'cps'], 'integer'],
+            [['tf_status', 'tf_type', 'sex'], 'string'],
             [['budget'], 'number'],
             [['create_at', 'update_at'], 'safe'],
             [['tag_ids', 'plan_number', 'age', 'degree'], 'string', 'max' => 20],
@@ -69,7 +69,7 @@ class AdPlans extends \yii\db\ActiveRecord
             'tag_ids' => 'Tag Ids',
             'plan_number' => '广告计划编号',
             'plan_name' => '广告计划名称',
-            'tf_status' => '投放状态值',
+            'tf_status' => '状态',
             'tf_type' => '投放类型值',
             'tf_value' => '投放值',
             'budget' => '预算',

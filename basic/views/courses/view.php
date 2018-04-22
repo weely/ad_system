@@ -13,7 +13,7 @@ $this->context->layout = false;
 
 <div class="courses-view">
     <div>
-        <div style="">
+        <div style="text-align: center">
             <h4 style="text-align: center">广告位预览</h4>
             <?php if ($model['is_h5']=='0'): ?>
             <div style="background: rgba(42,171,210,0.24);padding: 10px;margin-left: 135px;margin-right: 135px;" class="row">
@@ -46,7 +46,7 @@ $this->context->layout = false;
 
         <div id="sc_html" style="text-align: center">
             <h5>H5预览</h5>
-            <img src="<?php echo $model->img_html ?>" style="width: 300px;height: 400px;">
+            <img src="<?php echo $model->img_html ?>" style="width: 270px;height: 400px;">
         </div>
     </div>
 </div>

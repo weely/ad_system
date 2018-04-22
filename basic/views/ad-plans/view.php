@@ -35,8 +35,8 @@ $this->context->layout = false;
         'attributes' => [
 //            'id',
 //            'old_plan_id',
-            'user_id',
-            'tag_ids',
+//            'user_id',
+//            'tag_ids',
             'plan_number',
             'plan_name',
             'tf_status',

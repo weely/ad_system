@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use app\models\Courses;
 use app\models\CourseTags;
+use app\models\FundFlows;
+use app\models\User;
 use Project\Command\YourCustomCommand;
 use Yii;
 use app\models\AdPlans;
@@ -12,6 +14,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 //use yii\web\Controller;
 use app\controllers\LoginCheckController as Controller;
+use yii\web\Response;
+
 /**
  * AdPlansController implements the CRUD actions for AdPlans model.
  */
@@ -61,8 +65,136 @@ class AdPlansController extends Controller
             'courses' => $courses,
             'sucai_id' => $sucai_id
         ]);
+    }
+    /*
+     * 设置投放计划接口
+     */
+    public function actionSetTf(){
+        $user_id = Yii::$app->user->id;
+        $request = Yii::$app->request;
+        $plan_id = $request->get('plan_id');
+        $is_tf = $request->get('is_tf');
+
+        Yii::$app->response->format=Response::FORMAT_JSON;
+
+        if ($plan_id===null) {
+            return [
+                'code' => 0,
+                'msg' => '投放失败，未找到对应计划，请联系管理员再试'
+            ];
+        }
+        if ($is_tf===null) {
+            return [
+                'code' => 0,
+                'msg' => '投放失败，投放状态未确定'
+            ];
+        }
+
+        $userModel = Yii::$app->user->getIdentity("yii\web\User");
+//        if ($userModel->avail_fund <= 0) {
+//            return [
+//                'code' => 0,
+//                'msg' => '账户可用资金不足'
+//            ];
+//        }
+        $transaction=Yii::$app->db->beginTransaction();
+        try{
+            $model = $this->findModel($plan_id);
+            $model->tf_status = $is_tf ? '1' : '0';
+            $update_at = date("Y-m-d H:i:s", mktime());
+            $model->update_at = $update_at;
+            if ($model->save()){
+                if ($model->tf_status=='0') {
+                    Courses::updateAll(['tf_status'=>'0','is_online'=>'0','update_at'=>$update_at],'plan_id='.$plan_id);
+//                    Courses::updateAll(['tf_status'=>'0'],'plan_id='.$plan_id);
+                }
+                $transaction->commit();
+                $msg = $is_tf ? "开启投放成功,请您开始投放素材" : "计划关闭，计划下所有素材关闭成功";
+                return [
+                    'code'=>1,
+                    'msg'=> $msg
+                ];
+            } else {
+                return [
+                    'code' => 0,
+                    'msg' => '投放失败,错误提示：资金流水信息错误'
+                ];
+            }
+        }catch (Exception $e) {
+            $transaction->rollback();//如果操作失败, 数据回滚
+        }
+        // $transaction=Yii::$app->db->beginTransaction();
+        //        try{
+        //        $model = $this->findModel($plan_id);
+        //        $model->tf_status = $is_tf ? '1' : '0';
+        //        $model->update_at = date("Y-m-d H:i:s", mktime());
+        //        if ($model->save()){
+
+        //                if ($model->tf_status == '1') {
+        //                    /*
+        //                     * 开启投放，账户划账
+        //                     */
+        //                    $userModel = Yii::$app->user->getIdentity("yii\web\User");
+        //
+        //                    if ($userModel->avail_fund < $model->budget) {
+        //                        return [
+        //                            'code' => 0,
+        //                            'msg' => '账户可用资金不足'
+        //                        ];
+        //                    }
+        //                    $userModel->avail_fund -= $model->budget;
+        //                    $userModel->update_at = date("Y-m-d H:i:s", mktime());
+        //                    /*
+        //                     * 记录资金流水
+        //                     */
+        //                    $fundFlowModel = new FundFlows();
+        //                    $fundFlowModel->user_id = $user_id;
+        //                    $fundFlowModel->create_at = date("Y-m-d H:i:s", mktime());
+        //                    $fundFlowModel->update_at = date("Y-m-d H:i:s", mktime());;
+        //                    $fundFlowModel->capital = $model->budget;
+        //                    $fundFlowModel->flow_to = '-1';
+        //                    if (!$fundFlowModel->save()){
+        //                        //var_dump($fundFlowModel->errors);
+        //                        Yii::error($fundFlowModel->errors);
+        //                        return ['code' => 0,
+        //                            'msg' => '投放失败,错误提示：资金流水信息错误'
+        //                        ];
+        //                    }
+        //                    if (!$userModel->save()) {
+        //                        //var_dump($userModel->errors);
+        //                        Yii::error($userModel->errors);
+        //                        return ['code' => 0,
+        //                            'msg' => '投放失败,错误提示：用户投放信息错误'
+        //                        ];
+        //                    }
+        //                    $transaction->commit();//提交事务会真正的执行数据库操作
+        //                    return [
+        //                        'code'=>1,
+        //                        'msg'=> '投放成功'
+        //                    ];
+        //                } else {
+        //                    $transaction->commit();//提交事务会真正的执行数据库操作
+        //                    return [
+        //                        'code'=>1,
+        //                        'msg'=> '投放关闭成功'
+        //                    ];
+        //                }
+        //            return [
+        //                'code'=>1,
+        //                'msg'=> '投放关闭成功'
+        //            ];
+        //        } else {
+        //            return [
+        //                'code' => 0,
+        //                'msg' => '投放失败,错误提示：资金流水信息错误'
+        //            ];
+        //        }
+        //        }catch (Exception $e) {
+        //            $transaction->rollback();//如果操作失败, 数据回滚
+        //        }
 
     }
+
 
     /**
      * Displays a single AdPlans model.
@@ -115,58 +247,78 @@ class AdPlansController extends Controller
         $request = Yii::$app->request;
 
         if ($request->isPost) {
-
-//            var_dump($request->post('id'));
-
-
-            if ($request->post('id')) {
-                $model = $this->findModel($request->post('id'));
-            } else {
-                $model = new AdPlans();
-                $model->create_at = date("Y-m-d H:i:s", mktime());
-            }
-
-            $tf_date = $request->post('radio_date')=='-1'?'不限':$request->post('tf_date_begin')
-                .','.$request->post('tf_date_end');
-            $tf_period = $request->post('radio_time')=='-1'?'不限':$request->post('tf_time_begin')
-                .','.$request->post('tf_time_end');
-            $tf_addr = $request->post('radio_addr')=='-1'?'不限':$request->post('opt_addr');
-            $age = $request->post('radio_age')=='-1'?'不限':$request->post('opt_age_start')
-                .','.$request->post('opt_age_end');
-            $degree = $request->post('radio_degree')=='-1'?'不限':$request->post('opt_degree_start')
-                .','.$request->post('opt_degree_end');
-            $tf_value = $request->post('cash');
-            $budget = $request->post('budget');
-//            var_dump($tf_date);
-//            var_dump($tf_period);
-//            var_dump($tf_addr);
-//            var_dump($request->post('opt_addr_one'));
-//            var_dump($request->post('opt_addr_many'));
-
-            $model->user_id = $user_id;
-            $model->tag_ids = $request->post('opt_tags');
-            $model->plan_number = $request->post('plan_num');
-            $model->plan_name = $request->post('plan_name');
-//            $model->tf_status = $request->post('tf_status');
-            $model->tf_status = '2';
-            $model->tf_type = $request->post('radio_tf_type');
-            $model->tf_value = empty($tf_value) ? 0 : $tf_value;
-            $model->budget = empty($budget) ? 0 : $budget;;
-            $model->tf_date = $tf_date;
-            $model->tf_period = $tf_period;
-            $model->properties = $tf_addr;
-            $model->age = $age;
-            $model->sex = $request->post('radio_gender');
-            $model->degree = $degree;
-
-            if ($model->save()){
-                if ($request->post('is_redirect') == 1) {
-                    return $this->redirect('/index.php?r=courses/create&plan_id='.$model->id);
+            $transaction=Yii::$app->db->beginTransaction();
+            try{
+                if ($request->post('id')) {
+                    $model = $this->findModel($request->post('id'));
                 } else {
-                    return $this->redirect('/index.php?r=ad-plans/');
+                    $model = new AdPlans();
+                    $model->create_at = date("Y-m-d H:i:s", mktime());
                 }
-            } else {
-                return 'fail';
+
+                $tf_date = $request->post('radio_date')=='-1'?'不限':$request->post('tf_date_begin')
+                    .','.$request->post('tf_date_end');
+                $tf_period = $request->post('radio_time')=='-1'?'不限':$request->post('tf_time_begin')
+                    .','.$request->post('tf_time_end');
+                $tf_addr = $request->post('radio_addr')=='-1'?'不限':$request->post('opt_addr');
+                $age = $request->post('radio_age')=='-1'?'不限':$request->post('opt_age_start')
+                    .','.$request->post('opt_age_end');
+                $degree = $request->post('radio_degree')=='-1'?'不限':$request->post('opt_degree_start')
+                    .','.$request->post('opt_degree_end');
+                $tf_value = $request->post('cash');
+                $budget = $request->post('budget');
+    //            var_dump($tf_date);
+    //            var_dump($tf_period);
+    //            var_dump($tf_addr);
+    //            var_dump($request->post('opt_addr_one'));
+    //            var_dump($request->post('opt_addr_many'));
+
+                $model->user_id = $user_id;
+                $model->tag_ids = $request->post('opt_tags');
+                $model->plan_number = $request->post('plan_name');
+                $model->plan_name = $request->post('plan_name');
+                $model->tf_status = '2';
+                $model->tf_type = $request->post('radio_tf_type');
+                $model->tf_value = empty($tf_value) ? 0 : $tf_value;
+                $model->budget = empty($budget) ? 0 : $budget;;
+                $model->tf_date = $tf_date;
+                $model->tf_period = $tf_period;
+                $model->properties = $tf_addr;
+                $model->age = $age;
+                $model->sex = $request->post('radio_gender') ?: '-1';
+                $model->degree = $degree;
+                $model->update_at = date("Y-m-d H:i:s", mktime());
+
+                if ($model->save()){
+                    if ($model->tf_status == 1) {
+//                        $userModel = Yii::$app->user->getIdentity("yii\web\User");
+//                        $userModel->avail_fund -= $model->budget;
+//                        $fundFlowModel = new FundFlows();
+//                        $fundFlowModel->user_id = $user_id;
+//                        $fundFlowModel->create_at = date("Y-m-d H:i:s", mktime());;
+//                        $fundFlowModel->capital = $model->budget;
+//                        $fundFlowModel->flow_to = '-1';
+//                        if (!$fundFlowModel->save()){
+//                            var_dump($fundFlowModel->errors);
+//                            return "fundflow新增错误";
+//                        }
+//                        if (!$userModel->save()) {
+//                            var_dump($userModel->errors);
+//                            return "user更改错误";
+//                        }
+                    }
+                    $transaction->commit();//提交事务会真正的执行数据库操作
+                    if ($request->post('is_redirect') == 1) {
+                        return $this->redirect('/index.php?r=courses/create&plan_id='.$model->id);
+                    } else {
+                        return $this->redirect('/index.php?r=ad-plans/');
+                    }
+                } else {
+                    var_dump($model->errors);
+                    return "新建计划错误";
+                }
+            }catch (Exception $e) {
+                $transaction->rollback();//如果操作失败, 数据回滚
             }
         }
 
@@ -214,8 +366,20 @@ class AdPlansController extends Controller
     public function actionDelete($id)
     {
 //        $this->findModel($id)->delete();
+        $transaction=Yii::$app->db->beginTransaction();
+        try{
+            $model = $this->findModel($id);
+            $model->tf_status = '4';
+            $update_at = date("Y-m-d H:i:s", mktime());
+            if ($model->save()){
+                $courses = Courses::updateAll(['tf_status'=>'4','update_at'=>$update_at],'plan_id='.$id);
 
-        return $this->redirect('/index.php?r=site/ad-manage#plan');
+                $transaction->commit();
+                return $this->redirect('/index.php?r=site/ad-manage#plan');
+            }
+        }catch (Exception $e) {
+            $transaction->rollback();//如果操作失败, 数据回滚
+        }
     }
 
     /**

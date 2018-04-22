@@ -44,11 +44,15 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
             [['create_at', 'update_at'], 'safe'],
             [['username'], 'string', 'max' => 20],
             [['showname'], 'string', 'max' => 30],
-            [['password', 'mobile'], 'string', 'max' => 12],
-            [['cpx'], 'string', 'max' => 3],
-            [['token'], 'string', 'max' => 32],
-            [['username'], 'unique'],
+            [['password', 'mobile'], 'string', 'max' => 20],
             [['username', 'showname'], 'unique', 'targetAttribute' => ['username', 'showname']],
+//            [['username'], 'string', 'length'=>[2, 16], 'message'=>'账户编号请输入长度为2-16个字符'],
+            ['username','required','message'=>'请输入用户编号'],
+            ['username', 'string', 'length'=>[2, 16]],
+            ['showname','required','message'=>'请输入用户名'],
+            ['showname', 'string', 'length'=>[2, 16]],
+            ['password','required','message'=>'密码不能为空'],
+            ['password', 'string', 'length'=>[2, 24]],
         ];
     }
 
@@ -58,20 +62,20 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'is_admin' => 'Is Admin',
-            'username' => 'Username',
-            'showname' => 'Showname',
-            'password' => 'Password',
+            'id' => '用户ID',
+            'is_admin' => '管理员(是1/否0)',
+            'username' => '账户编号(字母、数字、下划线)',
+            'showname' => '账户名',
+            'password' => '密码',
             'cpx' => 'Cpx',
             'day' => 'Day',
-            'total_fund' => 'Total Fund',
-            'avail_fund' => 'Avail Fund',
+            'total_fund' => '总资金',
+            'avail_fund' => '可用资金',
             'mobile' => 'Mobile',
             'token' => 'Token',
             'token_expire' => 'Token Expire',
-            'create_at' => 'Create At',
-            'update_at' => 'Update At',
+            'create_at' => '创建日期',
+            'update_at' => '更新日期',
         ];
     }
     /**
@@ -100,7 +104,7 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
      */
     public static function findByUsername($username)
     {
-        $user = Users::find()
+        $user = User::find()
             ->where(['username'=>$username])
             ->asArray()
             ->one();

@@ -147,3 +147,49 @@ legend {
 caption {
     background-color: #cbd2ca;
 }
+
+.calendar-container{
+    text-align: center;
+    border:1px solid #ddd;
+    color: #51adff;
+    margin: 0;
+}
+.calendar-title {
+    text-align: center;
+    border:1px solid #ddd;
+    color: #2aabd2;
+}
+.calendar-item {
+    text-align: center;
+}
+.calendar-date {
+    text-align: center;
+    border:1px solid #ddd;
+    color: #256dd2;
+    cursor: pointer;
+    width: 14.286%;
+    margin: 0;
+    padding: 0;
+    /*z-index: 3;*/
+}
+
+.item-date-number{
+    font-size: 12px;margin: 0 0 10px 0;
+    text-align: center;
+    color: gray;
+    /*z-index: 2;*/
+}
+
+.item-gray-number{
+    font-size: 12px;margin: 0 0 10px 0;
+    text-align: center;
+    color: rgba(91, 91, 91, 0.4);
+    /*z-index: 2;*/
+}
+.item-number{
+    font-size: 12px;margin: 0 0 10px 0;
+    text-align: center;
+    color: #ffd000;
+    font-weight:bold;
+    /*z-index: 2;*/
+}

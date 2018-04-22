@@ -49,6 +49,44 @@ class CoursesController extends Controller
         ]);
     }
 
+    public function actionSetTf(){
+        $user_id = Yii::$app->user->id;
+        $request = Yii::$app->request;
+        $course_id = $request->get('course_id');
+        $is_tf = $request->get('is_tf');
+
+        Yii::$app->response->format=Response::FORMAT_JSON;
+
+        if ($course_id===null) {
+            return [
+                'code' => 0,
+                'msg' => '投放失败，未找到对应素材，请联系管理员再试'
+            ];
+        }
+        if ($is_tf===null) {
+            return [
+                'code' => 0,
+                'msg' => '投放失败，投放状态未确定'
+            ];
+        }
+        $model = $this->findModel($course_id);
+        $model->tf_status = $is_tf ? '1' : '0';
+        $model->update_at = date("Y-m-d H:i:s", mktime());
+        if ($model->save()) {
+            $msg = $is_tf ? "素材投放成功" : "素材关闭成功";
+            return [
+                'code' => 1,
+                'msg' => $msg
+            ];
+        } else {
+            return [
+                'code' => 0,
+                'msg' => '素材投放失败'
+            ];
+        }
+    }
+
+
     /**
      * Displays a single Courses model.
      * @param string $id
@@ -76,19 +114,21 @@ class CoursesController extends Controller
         if ($request->get('plan_id')) {
             $plans = AdPlans::find()
                 ->where(['id'=>$request->get('plan_id')])
+                ->andWhere(['<>','tf_status','4'])
                 ->asArray()
                 ->all();
         }
         if (!isset($plans) || count($plans)<=0) {
             $plans = AdPlans::find()
                 ->select('id,old_plan_id,plan_number,plan_name,properties')
-                ->where($user_id)
+                ->where($params)
+                ->andWhere(['<>','tf_status','4'])
                 ->asArray()
                 ->all();
         }
 
         if (count($plans)<=0) {
-            return '!请先创建广告计划';
+            return $this->render('error',['message'=> '！该账户下无广告计划，请先创建广告计划']);
         }
 
         $model = new Courses();
@@ -130,19 +170,16 @@ class CoursesController extends Controller
             $model->ad_type = '';
             $model->tag_ids = '';
             $model->logo = $request->post('logo') ?: '';
-
-//            var_dump($request->post('is_h5'));
-//            return;
-
             $model->img_html = $request->post('img_html') ?: '';
             $model->properties = $request->post('properties') ?: '';
             $model->tags = $request->post('tags') ?: '';
-            $model->logo = $request->post('logo') ?: '';
+            $model->update_at = date("Y-m-d H:i:s", mktime());
 
             if ($model->save()){
                 return $this->redirect('/index.php?r=courses/check-page');
             } else {
                 var_dump($model->errors);
+                return;
 //                return $this->render('error',[]);
             }
         }
@@ -178,9 +215,11 @@ class CoursesController extends Controller
                     'msg'=> '错误!传输文件过大'
                 ];
             }
-//            $file_name = strstr($file_name,'.') ? $file_name : ($file_name.'.'.$type);
-//            $user_path_show = "/uploads/".$username;
+
             $user_path = $_SERVER['DOCUMENT_ROOT']."/uploads/".$username;
+            if (!file_exists($user_path)) {
+                mkdir($user_path);
+            }
             if (strtolower($request->post('file_name')) == 'logo') {
                 $user_path .= '/logo';
             }
@@ -229,6 +268,7 @@ class CoursesController extends Controller
         $plans = AdPlans::find()
             ->select('id,old_plan_id,plan_number,plan_name,properties')
             ->where($params)
+            ->andWhere(['<>','tf_status','4'])
             ->asArray()
             ->all();
 
@@ -248,8 +288,12 @@ class CoursesController extends Controller
     public function actionDelete($id)
     {
 //        $this->findModel($id)->delete();
-
-        return $this->redirect('/index.php?r=site/ad-manage#sucai');
+        $model = $this->findModel($id);
+        $model->tf_status = '4';
+        $model->update_at = date("Y-m-d H:i:s", mktime());
+        if ($model->save()) {
+            return $this->redirect('/index.php?r=site/ad-manage#sucai');
+        }
     }
 
     /**

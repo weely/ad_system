@@ -52,15 +52,15 @@ AppAsset::register($this);
             )
         ],
     ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-center'],
-        'items' => [
-            ['label' => '数据中心', 'url' => ['/site/index']],
-            ['label' => '意向用户', 'url' => ['/site/intent-user']],
-            ['label' => '广告管理', 'url' => ['/site/ad-manage']],
-            ['label' => '财务管理', 'url' => ['/site/fund-manage']]
-        ],
-    ]);
+//    echo Nav::widget([
+//        'options' => ['class' => 'navbar-nav navbar-center'],
+//        'items' => [
+//            ['label' => '数据中心', 'url' => ['/site/index']],
+//            ['label' => '意向用户', 'url' => ['/site/intent-user']],
+//            ['label' => '广告管理', 'url' => ['/site/ad-manage']],
+//            ['label' => '财务管理', 'url' => ['/site/fund-manage']]
+//        ],
+//    ]);
 
     NavBar::end();
     ?>
