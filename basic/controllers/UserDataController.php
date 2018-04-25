@@ -6,6 +6,7 @@ use app\components\util\Util;
 use app\controllers\LoginCheckController as Controller;
 use app\models\HisUserData;
 use app\models\UserData;
+use yii\data\Pagination;
 
 
 class UserDataController extends Controller
@@ -32,19 +33,29 @@ class UserDataController extends Controller
         $params = ['c.user_id'=>$user_id];
         $today = date("Y-m-d", mktime());
 
+        $params['date_at'] = $date_at;
         if ($today == $date_at) {
-            $datas = UserData::find()
+            $query = UserData::find()
                 ->select('c.ad_sc_title,user_data.*')
                 ->leftJoin('courses as c','c.id=user_data.course_id')
-                ->where($params)
-                //->orderBy()
-                ->asArray()->all();
-
+                ->where($params);
         } else {
-            $params['date_at'] = $date_at;
-            $datas = HisUserData::find()->select('c.ad_sc_title,his_user_data.*')
+            $query = HisUserData::find()->select('c.ad_sc_title,his_user_data.*')
                 ->leftJoin('courses as c','c.id=his_user_data.course_id')
-                ->where($params)
+                ->where($params);
+        }
+
+        $page = new Pagination([
+            'defaultPageSize' => 10,
+            'totalCount' => $query->count(),
+            'pageParam' => 'page',
+//            'route'=> ''
+        ]);
+        if ($is_export) {
+            $datas = $query->asArray()->all();
+        } else {
+            $datas = $query->offset($page->offset)
+                ->limit($page->limit)
                 //->orderBy()
                 ->asArray()->all();
         }
@@ -68,7 +79,8 @@ class UserDataController extends Controller
         return $this->render('index',[
             'date_at' => $date_at,
             'titles' => $titles,
-            'datas'=>$resDatas
+            'datas'=>$resDatas,
+            'page'=>$page
         ]);
     }
 }

@@ -88,7 +88,6 @@ use yii\widgets\ActiveForm;
                 return false;
             }
         }
-
     }
 
 </script>
@@ -119,15 +118,15 @@ use yii\widgets\ActiveForm;
                 <div class="col-lg-8">
                     <div class="form-group">
                         <label class="form-label col-lg-1">
-                            <input type="radio" name="radio_tf_type" value="1" <?php echo $model->tf_type=='1' ?'checked':''; ?>>CPM</label>
+                            <input type="radio" name="radio_tf_type" value="1" <?php echo $model->tf_type=='1' ?'checked':''; ?> disabled>CPM</label>
                         <label class="form-label col-lg-1">
-                            <input type="radio" name="radio_tf_type" value="2" <?php echo $model->tf_type=='2' ?'checked':''; ?>>CPC</label>
+                            <input type="radio" name="radio_tf_type" value="2" <?php echo $model->tf_type=='2' ?'checked':''; ?> disabled>CPC</label>
                         <label class="form-label col-lg-1">
-                            <input type="radio" name="radio_tf_type" value="3" <?php echo $model->tf_type=='2' ?'checked':''; ?>>CPA</label>
+                            <input type="radio" name="radio_tf_type" value="3" <?php echo $model->tf_type=='3' ?'checked':''; ?>>CPA</label>
                         <label class="form-label col-lg-1">
                             <input type="radio" name="radio_tf_type" value="4" <?php echo $model->tf_type=='4' ?'checked':''; ?>>CPL</label>
                         <label class="form-label col-lg-1">
-                            <input type="radio" name="radio_tf_type" value="5" <?php echo $model->tf_type=='5' ?'checked':''; ?>>CPS</label>
+                            <input type="radio" name="radio_tf_type" value="5" <?php echo $model->tf_type=='5' ?'checked':''; ?> disabled>CPS</label>
                     </div>
 <!--                    <div class="form-group btn-group" role="group" aria-label="">-->
 <!--                        <input type="button" id="btn-cpa" class="btn btn-primary">CPA</input >-->

@@ -1,8 +1,10 @@
 <?php
 /* @var $this yii\web\View */
+use yii\widgets\LinkPager;
 
 $this->context->layout = false;
 ?>
+<div id="result">
 <table class="table table-striped table-bordered">
     <caption>
         <div class="col-lg-5">
@@ -35,13 +37,25 @@ $this->context->layout = false;
     <?php endforeach; ?>
     </tbody>
 </table>
+    <?= LinkPager::widget(['pagination' => $page,
+        'nextPageLabel' => '下一页',
+        'prevPageLabel' => '上一页',
+    ]) ?>
+
+</div>
 
 <script>
-$(function(){
-    // $("#btn-day-export").click(function(){
-    //
-    //     location.href = req_url;
-    // });
-});
-
+    $('.pagination a').click(function(){
+        if($(this).parent().hasClass('active'))
+            return false;
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('href'),
+            data: 'ajax=1',
+            success: function(ret){
+                $('#result').html(ret);
+            }
+        });
+        return false;
+    });
 </script>

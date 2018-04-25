@@ -53,6 +53,7 @@ class AdPlansController extends Controller
         $courses = Courses::find()
 //            ->select()
             ->where($params)
+            ->andWhere(['<>','tf_status','4'])
             ->orderBy('create_at')
             ->asArray()
             ->all();
@@ -90,7 +91,7 @@ class AdPlansController extends Controller
             ];
         }
 
-        $userModel = Yii::$app->user->getIdentity("yii\web\User");
+//        $userModel = Yii::$app->user->getIdentity("yii\web\User");
 //        if ($userModel->avail_fund <= 0) {
 //            return [
 //                'code' => 0,
@@ -105,8 +106,8 @@ class AdPlansController extends Controller
             $model->update_at = $update_at;
             if ($model->save()){
                 if ($model->tf_status=='0') {
-                    Courses::updateAll(['tf_status'=>'0','is_online'=>'0','update_at'=>$update_at],'plan_id='.$plan_id);
-//                    Courses::updateAll(['tf_status'=>'0'],'plan_id='.$plan_id);
+                    Courses::updateAll(['tf_status'=>'2','is_online'=>'0','update_at'=>$update_at],
+                        'plan_id='.$plan_id.' and tf_status=1');
                 }
                 $transaction->commit();
                 $msg = $is_tf ? "开启投放成功,请您开始投放素材" : "计划关闭，计划下所有素材关闭成功";
@@ -117,82 +118,12 @@ class AdPlansController extends Controller
             } else {
                 return [
                     'code' => 0,
-                    'msg' => '投放失败,错误提示：资金流水信息错误'
+                    'msg' => '投放失败'
                 ];
             }
         }catch (Exception $e) {
             $transaction->rollback();//如果操作失败, 数据回滚
         }
-        // $transaction=Yii::$app->db->beginTransaction();
-        //        try{
-        //        $model = $this->findModel($plan_id);
-        //        $model->tf_status = $is_tf ? '1' : '0';
-        //        $model->update_at = date("Y-m-d H:i:s", mktime());
-        //        if ($model->save()){
-
-        //                if ($model->tf_status == '1') {
-        //                    /*
-        //                     * 开启投放，账户划账
-        //                     */
-        //                    $userModel = Yii::$app->user->getIdentity("yii\web\User");
-        //
-        //                    if ($userModel->avail_fund < $model->budget) {
-        //                        return [
-        //                            'code' => 0,
-        //                            'msg' => '账户可用资金不足'
-        //                        ];
-        //                    }
-        //                    $userModel->avail_fund -= $model->budget;
-        //                    $userModel->update_at = date("Y-m-d H:i:s", mktime());
-        //                    /*
-        //                     * 记录资金流水
-        //                     */
-        //                    $fundFlowModel = new FundFlows();
-        //                    $fundFlowModel->user_id = $user_id;
-        //                    $fundFlowModel->create_at = date("Y-m-d H:i:s", mktime());
-        //                    $fundFlowModel->update_at = date("Y-m-d H:i:s", mktime());;
-        //                    $fundFlowModel->capital = $model->budget;
-        //                    $fundFlowModel->flow_to = '-1';
-        //                    if (!$fundFlowModel->save()){
-        //                        //var_dump($fundFlowModel->errors);
-        //                        Yii::error($fundFlowModel->errors);
-        //                        return ['code' => 0,
-        //                            'msg' => '投放失败,错误提示：资金流水信息错误'
-        //                        ];
-        //                    }
-        //                    if (!$userModel->save()) {
-        //                        //var_dump($userModel->errors);
-        //                        Yii::error($userModel->errors);
-        //                        return ['code' => 0,
-        //                            'msg' => '投放失败,错误提示：用户投放信息错误'
-        //                        ];
-        //                    }
-        //                    $transaction->commit();//提交事务会真正的执行数据库操作
-        //                    return [
-        //                        'code'=>1,
-        //                        'msg'=> '投放成功'
-        //                    ];
-        //                } else {
-        //                    $transaction->commit();//提交事务会真正的执行数据库操作
-        //                    return [
-        //                        'code'=>1,
-        //                        'msg'=> '投放关闭成功'
-        //                    ];
-        //                }
-        //            return [
-        //                'code'=>1,
-        //                'msg'=> '投放关闭成功'
-        //            ];
-        //        } else {
-        //            return [
-        //                'code' => 0,
-        //                'msg' => '投放失败,错误提示：资金流水信息错误'
-        //            ];
-        //        }
-        //        }catch (Exception $e) {
-        //            $transaction->rollback();//如果操作失败, 数据回滚
-        //        }
-
     }
 
 

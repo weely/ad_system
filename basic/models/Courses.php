@@ -11,7 +11,7 @@ use Yii;
  * @property string $id_project
  * @property string $user_id 广告主id
  * @property string $plan_id 计划id
- * @property int $tf_status 投放状态：1、投放中，2、待投放。0、待审核
+ * @property int $tf_status 投放状态:1.投放中,2.待投放,0.待审核;3.暂停投放,4.删除
  * @property string $tf_type 投放模式：1：CPM, 2: CPC, 3: CPA,4:CPL,5:CPS
  * @property int $tf_value 投放值
  * @property string $is_online 是否上线
@@ -26,11 +26,6 @@ use Yii;
  * @property string $tags 广告标签
  * @property string $create_at 创建时间
  * @property string $update_at 更新时间
- * @property string $cpm
- * @property string $cpc
- * @property int $cpa
- * @property int $cpl
- * @property string $cps
  * @property string $today
  * @property string $total 总的预约值
  * @property string $zhaopin_card 智联card版本
@@ -54,7 +49,7 @@ class Courses extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_project', 'user_id', 'plan_id', 'tf_status', 'tf_value', 'cpm', 'cpc', 'cpa', 'cpl', 'cps', 'today', 'total'], 'integer'],
+            [['id_project', 'user_id', 'plan_id', 'tf_status', 'tf_value', 'today', 'total'], 'integer'],
             [['plan_id'], 'required'],
             [['tf_type', 'is_online', 'is_h5'], 'string'],
             [['create_at', 'update_at'], 'safe'],
@@ -88,11 +83,6 @@ class Courses extends \yii\db\ActiveRecord
             'img_html' => 'H5大图',
             'properties' => '广告特点',
             'tags' => 'Tags',
-            'cpm' => 'Cpm量',
-            'cpc' => 'Cpc量',
-            'cpa' => 'Cpa量',
-            'cpl' => 'Cpl量',
-            'cps' => 'Cps量',
             'today' => 'Today',
             'total' => 'Total',
             'zhaopin_card' => 'Zhaopin Card',

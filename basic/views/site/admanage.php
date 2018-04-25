@@ -390,7 +390,7 @@ use yii\widgets\LinkPager;
         }else{
             var r=confirm("确定取消投放？");
             if (r==true) {
-                set_tf_url += '&course_id='+obj.id.substring('course_'.length) + "&is_tf=0"
+                set_tf_url += '&course_id='+obj.id.substring('course_'.length) + "&is_tf=2"
                 $.ajax(set_tf_url, {
                     dataType: 'json'
                 }).done(function (data) {

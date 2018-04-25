@@ -70,7 +70,14 @@ class CoursesController extends Controller
             ];
         }
         $model = $this->findModel($course_id);
-        $model->tf_status = $is_tf ? '1' : '0';
+        if (!in_array($model->tf_status,['1','2'])) {
+            return [
+                'code' => 0,
+                'msg' => "素材暂未审核通过，请先审核完成再投放"
+            ];
+        }
+        $model->tf_status = $is_tf;
+
         $model->update_at = date("Y-m-d H:i:s", mktime());
         if ($model->save()) {
             $msg = $is_tf ? "素材投放成功" : "素材关闭成功";

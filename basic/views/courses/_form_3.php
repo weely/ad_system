@@ -7,7 +7,7 @@ use yii\widgets\ActiveForm;
 /* @var $model app\models\Courses */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-<link rel="stylesheet" type="text/css" href="/css/preview.css">
+
 <script>
     $(function(){
         if ($("input[name='is_h5']:checked").val()=='0'){
@@ -37,23 +37,9 @@ use yii\widgets\ActiveForm;
         // $("input[name='is_online']").click(function(){
         //     console.log($(this).val());
         // });
-        $("input[name='h5']").click(function(){
-            if($(this).val()=='link'){
-                //打开链接输入框
-                $('#h5_link').show();
-                //打开链接预览
-                $('.link_pre').show();
-                $('.img_pre').hide();
-                
-                //关掉落地页大图相关的按钮编辑区域
-                $('#resetBtnWords .compileArea').addClass('hidden');
-                $('.collapseBtn').addClass('hidden');
-            }else if($(this).val()=='img'){
-                $('#h5_link').hide();
-                $('.img_pre').show();
-                $('.link_pre').hide();
-            }
-        });
+        // $("input[name='is_h5']").click(function(){
+        //     console.log($(this).val());
+        // });
         /**
          * 广告标题上传
          */
@@ -184,10 +170,10 @@ use yii\widgets\ActiveForm;
                 success: function (data) {
                     if (data.status == "true") {
                         // $("#modal-body").val(data.msg);
-                        // alert("上传成功");
+                        alert("上传成功");
                         // $("input[name='img_html']").val(data.msg.slice(0,-4));
                         $("input[name='img_html']").val(data.msg);
-                        $("#img_html_src").attr('src', data.msg);
+                        $("#img_img_html_src").attr('src', data.msg);
                     }
                     if (data.status == "error") {
                         // $("#modal-body").val(data.msg);
@@ -255,7 +241,7 @@ use yii\widgets\ActiveForm;
     }
 </script>
 
-<form class="courses-form form-horizontal col-lg-8" action="/index.php?r=courses/save" method="post" onsubmit="return check()">
+<form class="courses-form form-horizontal col-lg-9" action="/index.php?r=courses/save" method="post" onsubmit="return check()">
     <input name="_csrf" type="hidden" id="_csrf" value="<?= Yii::$app->request->csrfToken ?>">
     <input name="id" type="hidden" value="<?=$model->id?>">
     <div class="form-group">
@@ -288,7 +274,6 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
     </div>
-    <hr>
     <div class="form-group">
         <label class="form-label col-lg-3">Card类型:</label>
         <div class="col-lg-9">
@@ -365,7 +350,7 @@ use yii\widgets\ActiveForm;
         <div class="col-lg-9">
             <div class="form-group">
                 <label class="form-label col-lg-3">
-<!--                    <input type="radio" name="h5" value="img">-->
+                    <input type="radio" name="h5" value="1">
                     落地页大图</label>
                 <div class="col-lg-3" style="position: relative;">
                     <input type="button" value="上传" id="upload-H5" class="btn btn-default" style="display: block;
@@ -374,10 +359,9 @@ use yii\widgets\ActiveForm;
                     <input type="hidden" name="img_html" value="<?=$model['img_html']?>">
                 </div>
             </div>
-            
-           <!--  <div class="form-group">
+            <div class="form-group">
                 <label class="form-label col-lg-3">
-                    <input type="radio" name="h5" value="3">
+                    <input type="radio" name="h5" value="1">
                     H5源文件</label>
                 <div class="col-lg-3" style="position: relative;">
                     <input type="button" value="上传" id="" class="btn btn-default" style="display: block;
@@ -385,46 +369,6 @@ use yii\widgets\ActiveForm;
                     <input type="file" id="file-H5-upload" style="display: none;position: absolute;z-index: 5;opacity:0;">
                     <input type="hidden" name="img_html" value="<?=$model['img_html']?>">
                 </div>
-            </div> -->
-            <div id="resetBtnWords" class="form-group">
-                <input type="button" value="编辑按钮文案" class="btn btn-default">
-                <input type="button" class="collapseBtn hidden btn btn-default"  value="应用并收起">
-                <div class="hidden compileArea" style="border:1px solid #ddd;padding:10px;">
-                    <p style="margin:10px 0;">点击前:</p>
-                    <div class="btn-box box-item" style="padding-left: 20px">
-                        <div class="footer-left">
-                            <p class="row" style="margin: 0 0 10px;">
-                                <input id="btn_7" class="col-lg-3 form-control" type="" name="" value="价值" style="width:30%">
-                                <strong style="width:100px;overflow: hidden;display: block;padding:0;width:30%" class="money-num col-lg-3"><input maxlength="4" id="btn_4" type="" name="" value="288" class="form-control"></strong>
-                                <input id="btn_8" class="col-lg-3 form-control" type="" name="" value="元" style="width:30%">
-                            </p>
-                            <p class="course-type"><input class="form-control" id="btn_5" type="" name="" value="咨询会"></p>
-                        </div>
-                        <div class="footer-right">
-                            <div class="right-bottom">
-                                <input class="form-control" id="btn_6" type="" name="" value="立即0元抢">
-                            </div>
-                        </div>
-                    </div>
-                    <p style="margin:10px 0;">点击后:</p>
-                    <div class="succeed-box box-item"  style="padding-left: 20px">
-                        <div class="succeed-text-box">
-                            <p>
-                                <strong id="compellation"><input class="form-control" id="btn_1" type="" name="" value="您好"></strong><br> 
-                                <input class="form-control" id="btn_2" type="" name="" value="，您已成功获得咨询会礼包,学校老师会通过"><br>
-                                <strong id="uphone">18888888888</strong><br>
-                                <input class="form-control" id="btn_3" type="" name="" value="联系您">
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group" style="border-top: 1px solid #ddd;padding-top: 10px;">
-                <label class="form-label col-lg-3">
-                    <input type="radio" name="h5" value="link">
-                    落地页链接</label>
-                    <input id="h5_link" class="form-control" style="display: none" type="" name="" placeholder="请输入链接">
             </div>
         </div>
     </div>
@@ -438,82 +382,38 @@ use yii\widgets\ActiveForm;
     </div>
 </form>
 
-<div id="preview" class="col-lg-4" style="min-width: 375px;">
+<div class="col-lg-3">
     <div>
         <h4 style="text-align: center">广告位预览</h4>
         <div id="sc_preview_wz" style="background: rgba(42,171,210,0.24);padding: 10px;" class="row">
-            <h5 class="title_pre" >请输入标题</h5>
+            <h5><?=$model['ad_sc_title']?></h5>
             <div class="col-lg-3" style="padding: 0px;">
                 <img id="img_logo_src" src="<?php echo $model['logo'];?>" style="width: 70px;height: 70px;"></div>
             <div class="col-lg-9">
-                <div id="properties_pre" style="height: 20px">
-                    <span style="font-size: 14px;">线上</span>
-                    <span style="font-size: 14px;">可是</span>
+                <div>
+                    <?php foreach (explode(',',$model['properties']) as $tag): ?>
+                        <span style="font-size: 14px;"><?php echo $tag; ?></span>
+                    <?php endforeach; ?>
                 </div>
-                <div id="tags_pre" style="margin-bottom: 5px;margin-top: 2px;height: 20px">
-                    <span style="font-size: 14px;">免考</span>
-                    <span style="font-size: 14px;">终身可查</span>
+                <div style="margin-bottom: 5px;margin-top: 2px;">
+                    <?php foreach (explode(',',$model['tags']) as $tag): ?>
+                        <span style="font-size: 14px;"><?php echo $tag; ?></span>
+                    <?php endforeach; ?>
                 </div>
                 <div>
-                    <span style="font-size: 14px;">英孚英语</span>
+                    <span style="font-size: 14px;"><?=Yii::$app->user->getIdentity('"_identity":"yii\web\User"')['showname']?></span>
                     <span style="border:1px solid #4ba7f4;color: #4ba7f4;font-size: 14px;">智联教育</span>
                 </div>
             </div>
         </div>
-        <div id="sc_preview_tp" style="display: none;height:130px;overflow: hidden;background:rgb(230,230,230) url(imgs/logo.png) no-repeat center">
-            <img id="img_title_src" src="<?php echo $model['title_img'];?>" style="width: 100%;">
+        <div id="sc_preview_tp" style="display: none">
+            <img id="img_title_src" src="<?php echo $model['title_img'];?>" style="width: 270px;height: 150px;">
         </div>
     </div>
-    <div id="sc_html" style="text-align: center;">
-
-        <h5>H5预览</h5>
-
-        <div class="link_pre" style="display: none">
-            <p class="title_pre">请输入标题</p>
-            <iframe style="width:375px;height: 630px;overflow-y: scroll;" src="http://yinli100.com"></iframe>
-        </div>
-        <div class="img_pre" style="display:none;border:1px solid #ddd;    position: relative;">
-            <p class="title_pre" style="margin:0px auto;line-height: 30px;height: 30px;">请输入标题</p>
-            <div style="position: relative;width:375px;height: 630px;overflow-y: scroll;">
-                <img id="img_html_src" src="<?php echo $model['img_html'] ?>" style=" width: 100%;height: auto;">
-                <div class="footer-em">了解更多课程信息，请下载 <span class="text-em">名校MBA指南</span> APP</div>
-                <div class="contact-us"><p>智联教育广告投放，请联系Ada：15901822548</p></div>
-                <div style="height: 146px;"></div>
-            </div>
-            <footer id="footer-first" style="position: absolute;">
-                    <div class="apply-box">
-                        <ul style="top: 0px;">
-                            <li>
-                                <span>云女士</span>
-                                <span>177****8907</span>
-                                <span>2分钟前</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="btn-box box-item">
-                        <div class="footer-left">
-                            <p><span id="btn_7_pre">价值</span><strong class="money-num" id="btn_4_pre">288</strong><span id="btn_8_pre">元</span></p>
-                            <p class="course-type" id="btn_5_pre">咨询会</p>
-                        </div><div class="footer-right">
-                            <div class="right-top">
-                                <p class="apply-text">已有<strong class="people-num">425</strong>人报名</p>
-                                <p class="timer">55 : 12 : 01</p>
-                            </div>
-                            <div class="right-bottom">
-                                <button class="submit-btn" id="btn_6_pre">立即0元抢</button>
-                            </div>
-                        </div>
-                    </div>
-            </footer>
-        </div>
-        <footer id="footer-first" class="footer-second img_pre"  style="position: relative;display:none;">
-            <div class="succeed-box box-item" style="display: block">
-                <div class="succeed-text-box">
-                    <p><strong id="compellation"><span id="btn_1_pre">您好</span></strong><span id="btn_2_pre">您已成功获得咨询会礼包，学校老师会通过</span><strong id="uphone">18888888888</strong><span id="btn_3_pre">联系您</span></p>
-                </div>
-            </div>
-        </footer>
-    </div>
+<!--    <div id="sc_html" style="text-align: center">-->
+<!--        <h5>H5预览</h5>-->
+<!--        <img src="model->img_html" style="width: 270px;height: 360px;">-->
+<!--    </div>-->
 </div>
 
 <div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
@@ -528,87 +428,3 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    //设置预览：
-    var preview={
-        ids:['btn_1','btn_2','btn_3','btn_4','btn_5','btn_6','btn_7','btn_8','title'],
-        setProperties:function(){
-            var vs=$('#properties')[0].value.split(',');
-            if(vs.length==1&&!vs[0]){
-                $("#properties_pre").html('');
-                return;
-            };
-            var htm='';
-            vs.map(function(v){
-                htm+=' <span style="font-size: 14px;">'+v+'</span> ';
-            });
-            $("#properties_pre").html(htm?htm:e.target.placeholder);
-        },
-        setTags:function(){
-            var vs=$('#tags')[0].value.split(',');
-            if(vs.length==1&&!vs[0]){
-                $("#tags_pre").html('');
-                return;
-            };
-            var htm='';
-            vs.map(function(v){
-                htm+=' <span style="font-size: 14px;">'+v+'</span> ';
-            });
-            $("#tags_pre").html(htm?htm:e.target.placeholder);
-        },
-        setBtn:function(i){
-            var ids=this.ids;
-            var ele=$("#"+ids[i])[0];
-            var v=ele.value;
-            $("#"+ids[i]+"_pre").html(v?v:ele.placeholder);
-            if(ids[i]=='title'){
-                $("."+ids[i]+"_pre").html(v?v:ele.placeholder);
-            };
-            if(ids[i]=='btn_4'){
-                if(!v){
-                    $('#footer-first .footer-left .money-num').addClass('noBefore');
-                }else{
-                    $('#footer-first .footer-left .money-num').removeClass('noBefore');
-                }
-            }
-        },
-        bindChange:function(i){
-            var that=this;
-            $("#"+this.ids[i]).bind("input propertychange change",function(e){
-                that.setBtn(i);
-            });
-        },
-        bind:function(){
-            $("#properties").bind("input propertychange change",function(e){
-                preview.setProperties();
-            });
-            $("#tags").bind("input propertychange change",function(e){
-                preview.setTags();        
-            });
-            $('#h5_link').bind("input propertychange change",function(e){
-                $('.link_pre iframe').attr('src',e.target.value);
-            });
-            $('#resetBtnWords input').click(function(e){
-                $('#resetBtnWords .compileArea').removeClass('hidden');
-                $('.collapseBtn').removeClass('hidden').click(function(){
-                    $('#resetBtnWords .compileArea').addClass('hidden');
-                    $('.collapseBtn').addClass('hidden');
-                });
-            });
-
-            for (var i = 0; i<this.ids.length; i++) {
-                this.bindChange(i);
-            };
-        },
-
-        init:function(){
-            this.bind();
-            this.setProperties();
-            this.setTags();
-            for (var i = 0; i<this.ids.length; i++) {
-                this.setBtn(i);
-            };
-        },
-    };
-    preview.init();
-</script>

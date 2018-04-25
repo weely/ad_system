@@ -17,15 +17,14 @@ use Yii;
  * @property string $tf_type 投放模式：1：CPM, 2: CPC, 3: CPA,4:CPL,5:CPS
  * @property int $tf_value 投放值
  * @property double $budget 每日预算
+ * @property double $total_budget 总预算
+ * @property double $price 每条单价
  * @property string $tf_date 投放日期
  * @property string $tf_period 投放时段
  * @property string $properties 投放区域
  * @property string $age 年龄约束
  * @property string $sex 性别约束: 1、男，-1、女,0、不限
  * @property string $degree 学历约束
- * @property string $cpm
- * @property string $cpc
- * @property string $cps
  * @property string $create_at 计划生成时间
  * @property string $update_at 计划更新时间
  */
@@ -45,9 +44,9 @@ class AdPlans extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['old_plan_id', 'user_id', 'tf_value', 'cpm', 'cpc', 'cps'], 'integer'],
+            [['old_plan_id', 'user_id', 'tf_value'], 'integer'],
             [['tf_status', 'tf_type', 'sex'], 'string'],
-            [['budget'], 'number'],
+            [['budget', 'total_budget', 'price'], 'number'],
             [['create_at', 'update_at'], 'safe'],
             [['tag_ids', 'plan_number', 'age', 'degree'], 'string', 'max' => 20],
             [['plan_name'], 'string', 'max' => 30],
@@ -73,15 +72,14 @@ class AdPlans extends \yii\db\ActiveRecord
             'tf_type' => '投放类型值',
             'tf_value' => '投放值',
             'budget' => '预算',
+            'total_budget' => '总预算',
+            'price' => '单价',
             'tf_date' => '投放日期',
             'tf_period' => '投放时段',
             'properties' => '投放区域',
             'age' => '年龄',
             'sex' => '投放性别',
             'degree' => '学位',
-            'cpm' => 'Cpm',
-            'cpc' => 'Cpc',
-            'cps' => 'Cps',
             'create_at' => '广告计划创建时间',
             'update_at' => '更新时间',
         ];
