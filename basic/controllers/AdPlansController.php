@@ -126,7 +126,6 @@ class AdPlansController extends Controller
         }
     }
 
-
     /**
      * Displays a single AdPlans model.
      * @param string $id
@@ -158,7 +157,7 @@ class AdPlansController extends Controller
             $ages[$i] = $i.'岁';
         }
 
-        $degrees = [1=>'高中',2=>'专科',3=>'本科',4=>'专硕',5=>'学硕',6=>'博士'];
+        $degrees = Yii::$app->params['tf_degree'];
 
 //        if ($model->load(Yii::$app->request->post()) && $model->save()) {
 //            return $this->redirect(['view', 'id' => $model->id]);
@@ -185,38 +184,39 @@ class AdPlansController extends Controller
                 } else {
                     $model = new AdPlans();
                     $model->create_at = date("Y-m-d H:i:s", mktime());
+                    $model->tf_type = $request->post('radio_tf_type');
+                    $tf_value = $request->post('cash');
+                    $model->tf_value = empty($tf_value) ? 0 : $tf_value;
+                    $model->tf_status = '0';
                 }
 
-                $tf_date = $request->post('radio_date')=='-1'?'不限':$request->post('tf_date_begin')
+                $tf_date = $request->post('radio_date')=='-1'?'':$request->post('tf_date_begin')
                     .','.$request->post('tf_date_end');
-                $tf_period = $request->post('radio_time')=='-1'?'不限':$request->post('tf_time_begin')
+                $tf_period = $request->post('radio_time')=='-1'?'':$request->post('tf_time_begin')
                     .','.$request->post('tf_time_end');
-                $tf_addr = $request->post('radio_addr')=='-1'?'不限':$request->post('opt_addr');
-                $age = $request->post('radio_age')=='-1'?'不限':$request->post('opt_age_start')
+
+                $tf_addr = $request->post('radio_addr')=='-1'?'':
+                    (strpos($request->post('opt_addr'),'-') ?
+                        preg_replace('/-/i',',',$request->post('opt_addr')):
+                            $request->post('opt_addr'));
+
+
+                $age = $request->post('radio_age')=='-1'?'':$request->post('opt_age_start')
                     .','.$request->post('opt_age_end');
-                $degree = $request->post('radio_degree')=='-1'?'不限':$request->post('opt_degree_start')
+                $degree = $request->post('radio_degree')=='-1'?'-1':$request->post('opt_degree_start')
                     .','.$request->post('opt_degree_end');
-                $tf_value = $request->post('cash');
                 $budget = $request->post('budget');
-    //            var_dump($tf_date);
-    //            var_dump($tf_period);
-    //            var_dump($tf_addr);
-    //            var_dump($request->post('opt_addr_one'));
-    //            var_dump($request->post('opt_addr_many'));
 
                 $model->user_id = $user_id;
                 $model->tag_ids = $request->post('opt_tags');
-                $model->plan_number = $request->post('plan_name');
+                $model->plan_number = $request->post('plan_name').time();
                 $model->plan_name = $request->post('plan_name');
-                $model->tf_status = '2';
-                $model->tf_type = $request->post('radio_tf_type');
-                $model->tf_value = empty($tf_value) ? 0 : $tf_value;
                 $model->budget = empty($budget) ? 0 : $budget;;
                 $model->tf_date = $tf_date;
                 $model->tf_period = $tf_period;
                 $model->properties = $tf_addr;
                 $model->age = $age;
-                $model->sex = $request->post('radio_gender') ?: '-1';
+                $model->sex = $request->post('radio_gender');
                 $model->degree = $degree;
                 $model->update_at = date("Y-m-d H:i:s", mktime());
 
@@ -245,7 +245,12 @@ class AdPlansController extends Controller
                         return $this->redirect('/index.php?r=ad-plans/');
                     }
                 } else {
-                    var_dump($model->errors);
+                    if (key_exists('plan_name', $model->errors)) {
+                        return $this->render('info', [
+                            'message'=> $model->errors['plan_name'][0]
+                        ]);
+//                        return $this->redirect(Yii::$app->request->getReferrer());
+                    }
                     return "新建计划错误";
                 }
             }catch (Exception $e) {
@@ -276,7 +281,7 @@ class AdPlansController extends Controller
             $ages[$i] = $i.'岁';
         }
 
-        $degrees = [1=>'高中',2=>'专科',3=>'本科',4=>'专硕',5=>'学硕',6=>'博士'];
+        $degrees = Yii::$app->params['tf_degree'];
 
         return $this->render('create', [
             'model' => $model,

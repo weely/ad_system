@@ -81,8 +81,8 @@ use yii\widgets\LinkPager;
                                 <?php echo $plan['plan_name']; ?>
                                 </a></td>
                             <td><?php echo Yii::$app->params['ad_status'][$plan['tf_status']]; ?></td>
-                            <td style="font-size: 12px;"><?php echo $plan['tf_date']; ?></td>
-                            <td><?php echo $plan['tf_period']; ?></td>
+                            <td style="font-size: 12px;"><?php echo $plan['tf_date'] ?: '不限';?></td>
+                            <td><?php echo $plan['tf_period'] ?: '不限';?></td>
                             <td><?php echo Yii::$app->params['tf_type'][$plan['tf_type']]; ?></td>
                             <td><?php echo $plan['budget']; ?></td>
                             <!-- TODO 计划详情等链接-->

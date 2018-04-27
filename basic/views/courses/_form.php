@@ -37,8 +37,19 @@ use yii\widgets\ActiveForm;
         // $("input[name='is_online']").click(function(){
         //     console.log($(this).val());
         // });
+        if ($("input[name='h5']:checked").val()=='0'){
+            $('#h5_link').hide();
+            $('.img_pre').show();
+            $('.link_pre').hide();
+        } else if ($("input[name='h5']:checked").val()=='1') {
+            $('#h5_link').show();
+            //打开链接预览
+            $('.link_pre').show();
+            $('.img_pre').hide();
+        }
+
         $("input[name='h5']").click(function(){
-            if($(this).val()=='link'){
+            if($(this).val()=='1'){
                 //打开链接输入框
                 $('#h5_link').show();
                 //打开链接预览
@@ -48,7 +59,7 @@ use yii\widgets\ActiveForm;
                 //关掉落地页大图相关的按钮编辑区域
                 $('#resetBtnWords .compileArea').addClass('hidden');
                 $('.collapseBtn').addClass('hidden');
-            }else if($(this).val()=='img'){
+            }else if($(this).val()=='0'){
                 $('#h5_link').hide();
                 $('.img_pre').show();
                 $('.link_pre').hide();
@@ -309,19 +320,18 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
     </div>
-
-<!--    <div class="form-group">-->
-<!--        <label class="form-label col-lg-3">广告种类:</label>-->
-<!--        <div class="col-lg-9">-->
-<!--            <div class="form-group">-->
-<!--                <div class="col-lg-4">-->
-<!--                    <select id="tag_ids" name="tag_ids" class="form-control">-->
-<!--                        <option value="1">北京</option>-->
-<!--                    </select>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
+        <!--    <div class="form-group">-->
+        <!--        <label class="form-label col-lg-3">广告种类:</label>-->
+        <!--        <div class="col-lg-9">-->
+        <!--            <div class="form-group">-->
+        <!--                <div class="col-lg-4">-->
+        <!--                    <select id="tag_ids" name="tag_ids" class="form-control">-->
+        <!--                        <option value="1">北京</option>-->
+        <!--                    </select>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+        <!--    </div>-->
     <div id="is_show" style="display: none;">
         <div class="form-group">
             <label class="form-label col-lg-3">广告特点:</label>
@@ -346,8 +356,6 @@ use yii\widgets\ActiveForm;
             <label class="form-label col-lg-3">LOGO:</label>
             <div class="col-lg-9">
                 <div class="form-group">
-            <!--    <input type="button" name="img_name" value="上传" class="btn btn-default">-->
-            <!--    <span style="color: #365550;font-size: small">png、jpg格式,200px*200px</span>-->
                     <div style="position: relative;">
                         <input type="button" value="上传" id="upload-logo" class="btn btn-default" style="display: block;
                         position: absolute;z-index: 1;">
@@ -365,7 +373,7 @@ use yii\widgets\ActiveForm;
         <div class="col-lg-9">
             <div class="form-group">
                 <label class="form-label col-lg-3">
-<!--                    <input type="radio" name="h5" value="img">-->
+                    <input type="radio" name="h5" value="0" <?php echo $model['is_link']=='0'?'checked':'' ?>>
                     落地页大图</label>
                 <div class="col-lg-3" style="position: relative;">
                     <input type="button" value="上传" id="upload-H5" class="btn btn-default" style="display: block;
@@ -374,7 +382,48 @@ use yii\widgets\ActiveForm;
                     <input type="hidden" name="img_html" value="<?=$model['img_html']?>">
                 </div>
             </div>
-            
+            <?php if ($model['tf_type'] == '3'): ?>
+                <div class="form-group" style="border-top: 1px solid #ddd;padding-top: 10px;">
+                    <label class="form-label col-lg-3">
+                        <input type="radio" name="h5" value="1" <?php echo $model['is_link']=='1'?'checked':'' ?>>
+                        落地页链接</label>
+                    <input id="h5_link" class="form-control" style="display: none" type="text" name="img_html" value="<?=$model['img_html']?>" placeholder="请输入链接">
+                </div>
+            <?php elseif($model['tf_type'] == '4'): ?>
+                <div id="resetBtnWords" class="form-group">
+                    <input type="button" value="编辑按钮文案" class="btn btn-default">
+                    <input type="button" class="collapseBtn hidden btn btn-default"  value="应用并收起">
+                    <div class="hidden compileArea" style="border:1px solid #ddd;padding:10px;">
+                        <p style="margin:10px 0;">点击前:</p>
+                        <div class="btn-box box-item" style="padding-left: 20px">
+                            <div class="footer-left">
+                                <p class="row" style="margin: 0 0 10px;">
+                                    <input id="btn_7" class="col-lg-3 form-control" type="" name="" value="价值" style="width:30%">
+                                    <strong style="width:100px;overflow: hidden;display: block;padding:0;width:30%" class="money-num col-lg-3"><input maxlength="4" id="btn_4" type="" name="" value="288" class="form-control"></strong>
+                                    <input id="btn_8" class="col-lg-3 form-control" type="" name="" value="元" style="width:30%">
+                                </p>
+                                <p class="course-type"><input class="form-control" id="btn_5" type="" name="" value="咨询会"></p>
+                            </div>
+                            <div class="footer-right">
+                                <div class="right-bottom">
+                                    <input class="form-control" id="btn_6" type="" name="" value="立即0元抢">
+                                </div>
+                            </div>
+                        </div>
+                        <p style="margin:10px 0;">点击后:</p>
+                        <div class="succeed-box box-item"  style="padding-left: 20px">
+                            <div class="succeed-text-box">
+                                <p>
+                                    <strong id="compellation"><input class="form-control" id="btn_1" type="" name="" value="您好"></strong><br>
+                                    <input class="form-control" id="btn_2" type="" name="" value="，您已成功获得咨询会礼包,学校老师会通过"><br>
+                                    <strong id="uphone">18888888888</strong><br>
+                                    <input class="form-control" id="btn_3" type="" name="" value="联系您">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif ?>
            <!--  <div class="form-group">
                 <label class="form-label col-lg-3">
                     <input type="radio" name="h5" value="3">
@@ -382,53 +431,12 @@ use yii\widgets\ActiveForm;
                 <div class="col-lg-3" style="position: relative;">
                     <input type="button" value="上传" id="" class="btn btn-default" style="display: block;
                     position: absolute;z-index: 1;">
-                    <input type="file" id="file-H5-upload" style="display: none;position: absolute;z-index: 5;opacity:0;">
-                    <input type="hidden" name="img_html" value="<?=$model['img_html']?>">
+                    <input type="file" id="" style="display: none;position: absolute;z-index: 5;opacity:0;">
+                    <input type="hidden" name="" value="">
                 </div>
             </div> -->
-            <div id="resetBtnWords" class="form-group">
-                <input type="button" value="编辑按钮文案" class="btn btn-default">
-                <input type="button" class="collapseBtn hidden btn btn-default"  value="应用并收起">
-                <div class="hidden compileArea" style="border:1px solid #ddd;padding:10px;">
-                    <p style="margin:10px 0;">点击前:</p>
-                    <div class="btn-box box-item" style="padding-left: 20px">
-                        <div class="footer-left">
-                            <p class="row" style="margin: 0 0 10px;">
-                                <input id="btn_7" class="col-lg-3 form-control" type="" name="" value="价值" style="width:30%">
-                                <strong style="width:100px;overflow: hidden;display: block;padding:0;width:30%" class="money-num col-lg-3"><input maxlength="4" id="btn_4" type="" name="" value="288" class="form-control"></strong>
-                                <input id="btn_8" class="col-lg-3 form-control" type="" name="" value="元" style="width:30%">
-                            </p>
-                            <p class="course-type"><input class="form-control" id="btn_5" type="" name="" value="咨询会"></p>
-                        </div>
-                        <div class="footer-right">
-                            <div class="right-bottom">
-                                <input class="form-control" id="btn_6" type="" name="" value="立即0元抢">
-                            </div>
-                        </div>
-                    </div>
-                    <p style="margin:10px 0;">点击后:</p>
-                    <div class="succeed-box box-item"  style="padding-left: 20px">
-                        <div class="succeed-text-box">
-                            <p>
-                                <strong id="compellation"><input class="form-control" id="btn_1" type="" name="" value="您好"></strong><br> 
-                                <input class="form-control" id="btn_2" type="" name="" value="，您已成功获得咨询会礼包,学校老师会通过"><br>
-                                <strong id="uphone">18888888888</strong><br>
-                                <input class="form-control" id="btn_3" type="" name="" value="联系您">
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group" style="border-top: 1px solid #ddd;padding-top: 10px;">
-                <label class="form-label col-lg-3">
-                    <input type="radio" name="h5" value="link">
-                    落地页链接</label>
-                    <input id="h5_link" class="form-control" style="display: none" type="" name="" placeholder="请输入链接">
-            </div>
         </div>
     </div>
-
 
     <div class="form-group">
         <div class="col-lg-offset-3">
@@ -439,6 +447,7 @@ use yii\widgets\ActiveForm;
 </form>
 
 <div id="preview" class="col-lg-4" style="min-width: 375px;">
+    <!--    广告位预览-->
     <div>
         <h4 style="text-align: center">广告位预览</h4>
         <div id="sc_preview_wz" style="background: rgba(42,171,210,0.24);padding: 10px;" class="row">
@@ -464,49 +473,56 @@ use yii\widgets\ActiveForm;
             <img id="img_title_src" src="<?php echo $model['title_img'];?>" style="width: 100%;">
         </div>
     </div>
+    <hr>
+    <!--    H5大图预览-->
     <div id="sc_html" style="text-align: center;">
-
         <h5>H5预览</h5>
 
-        <div class="link_pre" style="display: none">
+        <div class="img_pre" style="position: relative;">
             <p class="title_pre">请输入标题</p>
-            <iframe style="width:375px;height: 630px;overflow-y: scroll;" src="http://yinli100.com"></iframe>
-        </div>
-        <div class="img_pre" style="display:none;border:1px solid #ddd;    position: relative;">
-            <p class="title_pre" style="margin:0px auto;line-height: 30px;height: 30px;">请输入标题</p>
             <div style="position: relative;width:375px;height: 630px;overflow-y: scroll;">
                 <img id="img_html_src" src="<?php echo $model['img_html'] ?>" style=" width: 100%;height: auto;">
-                <div class="footer-em">了解更多课程信息，请下载 <span class="text-em">名校MBA指南</span> APP</div>
-                <div class="contact-us"><p>智联教育广告投放，请联系Ada：15901822548</p></div>
-                <div style="height: 146px;"></div>
             </div>
-            <footer id="footer-first" style="position: absolute;">
-                    <div class="apply-box">
-                        <ul style="top: 0px;">
-                            <li>
-                                <span>云女士</span>
-                                <span>177****8907</span>
-                                <span>2分钟前</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="btn-box box-item">
-                        <div class="footer-left">
-                            <p><span id="btn_7_pre">价值</span><strong class="money-num" id="btn_4_pre">288</strong><span id="btn_8_pre">元</span></p>
-                            <p class="course-type" id="btn_5_pre">咨询会</p>
-                        </div><div class="footer-right">
-                            <div class="right-top">
-                                <p class="apply-text">已有<strong class="people-num">425</strong>人报名</p>
-                                <p class="timer">55 : 12 : 01</p>
-                            </div>
-                            <div class="right-bottom">
-                                <button class="submit-btn" id="btn_6_pre">立即0元抢</button>
-                            </div>
-                        </div>
-                    </div>
-            </footer>
         </div>
-        <footer id="footer-first" class="footer-second img_pre"  style="position: relative;display:none;">
+
+        <?php if($model['tf_type'] == '3'): ?>
+        <div class="link_pre" style="display: none">
+            <p class="title_pre">请输入标题</p>
+            <iframe style="width:375px;height: 630px;overflow-y: scroll;" src="<?=$model['img_html']?>"></iframe>
+        </div>
+        <?php elseif ($model['tf_type'] == '4'): ?>
+        <!-- 显示按钮-->
+        <footer id="footer-first" style="position: absolute;">
+            <div class="apply-box">
+                <ul style="top: 0px;">
+                    <li>
+                        <span>云女士</span>
+                        <span>177****8907</span>
+                        <span>2分钟前</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-box box-item">
+                <div class="footer-left">
+                    <p><span id="btn_7_pre">价值</span><strong class="money-num" id="btn_4_pre">288</strong><span id="btn_8_pre">元</span></p>
+                    <p class="course-type" id="btn_5_pre">咨询会</p>
+                </div><div class="footer-right">
+                    <div class="right-top">
+                        <p class="apply-text">已有<strong class="people-num">425</strong>人报名</p>
+                        <p class="timer">55 : 12 : 01</p>
+                    </div>
+                    <div class="right-bottom">
+                        <button class="submit-btn" id="btn_6_pre">立即0元抢</button>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <?php endif;?>
+        <div class="footer-em">了解更多课程信息，请下载 <span class="text-em">名校MBA指南</span> APP</div>
+        <div class="contact-us"><p>智联教育广告投放，请联系Ada：15901822548</p></div>
+        <div style="height: 146px;"></div>
+
+        <footer id="footer-first" class="footer-second"  style="position: relative;display:none;">
             <div class="succeed-box box-item" style="display: block">
                 <div class="succeed-text-box">
                     <p><strong id="compellation"><span id="btn_1_pre">您好</span></strong><span id="btn_2_pre">您已成功获得咨询会礼包，学校老师会通过</span><strong id="uphone">18888888888</strong><span id="btn_3_pre">联系您</span></p>

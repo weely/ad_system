@@ -58,7 +58,8 @@ $this->context->layout = false;
                 </div>
                 <div style="text-align: center">
                     <h4>H5预览</h4>
-                    <img src="<?php echo $item['img_html']; ?>" style="width:280px;height:360px;">
+                    <iframe style="width:375px;height: 630px;overflow-y: scroll;" src="<?=$item['img_html']?>"></iframe>
+                    <!--<img src="--><?php //echo $item['img_html']; ?><!--" style="width:280px;height:360px;">-->
                 </div>
 
             </div>

@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\FundFlows;
+use app\models\HisUserData;
 use app\models\UserData;
 use Yii;
 use yii\data\Pagination;
@@ -74,10 +75,15 @@ class SiteController extends Controller
         $user_id = Yii::$app->user->id;
         $request = Yii::$app->request;
 
+//        var_dump($user_id);
+//        return ;
+//        $page_size = isset($request->page_size) ? $request->page_size : 10;
+//        $page_num = isset($request->page_num) ? $request->page_num : 1;
+
         $plan_id = $request->get('plan_id');
         $c_id = $request->get('c_id');
 //        $order_value = $request->get('order_value') ?: 'date_at';
-        $order_value = 'user_data.date_at';
+        $order_value = 'his_user_data.date_at';
         //1-> asc, 0->desc;
         $order_type = $request->get('order_value') && $request->get('order_value')==1  ? 'ASC' : 'DESC';
         $begin_time = $request->get("begin_time");
@@ -89,10 +95,10 @@ class SiteController extends Controller
         /*参数字段*/
         $aPparams = ['user_id'=>$user_id];              //广告计划查询参数
         $cParams = ['user_id'=>$user_id];               //广告素材查询参数
-        $dataParams = ['user_data.user_id' => $user_id];            //数据查询参数
-        $dgpParams = 'user_data.date_at';            //分组参数
-        $data_sql = ['plan.tf_type', 'plan.tf_value', 'sum(h.show_num) as show_num', 'sum(h.click_num) as click_num',
-            'sum(h.book_num) as book_num', 'user_data.date_at'];
+        $tdParams = ['user_data.user_id' => $user_id];            //当天数据查询参数
+        $hdParams = ['his_user_data.user_id' => $user_id];            //历史数据查询参数
+        $tgpParams = '';
+        $htgpParams = 'his_user_data.date_at';              //历史数据分组参数
 
         /*查询数据*/
         $userPlans = $apQuery->select('id,plan_name')->where($aPparams)->andWhere(['<>','tf_status','4'])->orderBy('id')->asArray()->all();
@@ -102,24 +108,32 @@ class SiteController extends Controller
         array_unshift($userCourses, ['id'=>'-1', 'ad_sc_title'=>'全部素材']);
 
         if (!$plan_id && !$c_id){
-            $data_sql[] = 'user_data.user_id';
+            $today_sql = 'user_data.user_id as id,';
+            $tgpParams .= ',user_data.user_id';
 
-            $dgpParams .= ',user_data.user_id';
+            $his_sql_sel = 'his_user_data.user_id as id,';
+            $htgpParams .= ',his_user_data.user_id';
         }
         if ($plan_id) {
             $aPparams['id'] = $plan_id;
             $cParams['plan_id'] = $plan_id;
+            $tdParams['plan_id'] = $plan_id;
+            $hdParams['plan_id'] = $plan_id;
+            $tgpParams .= ',user_data.plan_id';
 
-            $dataParams['user_data.plan_id'] = $plan_id;
-            $data_sql[] = 'user_data.plan_id';
-            $dgpParams .= ',user_data.plan_id';
+            $today_sql = 'user_data.plan_id as id,';
+            $his_sql_sel = 'his_user_data.plan_id as id,';
+            $htgpParams .= ',his_user_data.plan_id';
         }
         if ($c_id) {
             $cParams['id'] = $c_id;
+            $tdParams['course_id'] = $c_id;
+            $hdParams['course_id'] = $c_id;
+            $tgpParams .= ',user_data.course_id';
 
-            $dataParams['user_data.course_id'] = $c_id;
-            $data_sql[] = 'user_data.course_id';
-            $dgpParams .= ',user_data.course_id';
+            $today_sql = 'user_data.course_id as id,';
+            $his_sql_sel = 'his_user_data.course_id as id,';
+            $htgpParams .= ', his_user_data.course_id';
         }
         //投放状态： 0-> 待审核  ，1->投放中，  2->待投放
         $cParams['tf_status'] = '1';
@@ -129,68 +143,152 @@ class SiteController extends Controller
         $cParams['tf_status'] = '0';
         $dsk = count($cQuery->where($cParams)->all());
 
+        $todayFilterParams = [];
+        $hdfilterInParams = [];
         $today = date("Y-m-d", mktime());
-        $flag = '';
 
-        $dataQuery = UserData::find();
-        $filterInParams = [];
+        $flag = '';
+        $today_sql = ['plan.tf_type', 'plan.tf_value', 'sum(h.show_num) as show_num', 'sum(h.click_num) as click_num',
+            'sum(h.book_num) as book_num', 'user_data.date_at'];
         if ($begin_time && $end_time) {
             if ($begin_time > $end_time) {
                 return "";
             }
             $yesday = date("Y-m-d",strtotime("-1 day"));
-            if ($begin_time == $end_time) {
-                if ($end_time == $today) {
-                    $flag = 'today';
-                }
-                if ($end_time == $yesday) {
-                    $flag = 'yestoday';
-                }
-                $data_sql[] = "date_format(user_data.create_at, '%H') as hour";
-                $dataParams['date_at'] = $end_time;
+            if ($end_time == $today && $end_time == $begin_time) {
+                $hdfilterInParams = '1=-1';     //只查当天数据
 
-                //$filterInParams = "date_format(user_data.create_at, '%H') = date_format(h.time, '%H')";
-                $dgpParams .= ',hour';
-
-                $order_value = 'hour';
-            } else{
-                if ($end_time == $yesday && strtotime($end_time)-strtotime($begin_time)==6*24*3600) {
-                    $flag = 'week';
-                }
-                $filterInParams = ['between', 'user_data.date_at',$begin_time, $end_time];
+                $today_sql[] = "date_format(user_data.create_at, '%H') as hour";
+                $tgpParams .= ', hour';
+            // $today_sql .= "date_format(user_data.create_at, '%Y-%m-%d')";
+            } else {
+                $hdfilterInParams = ['between', 'his_user_data.date_at',$begin_time, $end_time];
+                $tgpParams .= ', user_data.date_at';
             }
+            if ($today != $end_time) {
+                $todayFilterParams = '1=-1';    //不查当天数据
+            } else {
+                $tdParams['user_data.date_at'] = $end_time;
+            }
+            if ($end_time == $today && $end_time == $begin_time) {
+                $flag = 'today';
+            }
+            if ($end_time == $yesday && $end_time == $begin_time) {
+                $flag = 'yestoday';
+            }
+            if ($end_time == $yesday && strtotime($end_time)-strtotime($begin_time)==6*24*3600) {
+                $flag = 'week';
+            }
+        } else {
+            $tdParams['user_data.date_at'] = $today;
         }
 
-        $dataQuery = $dataQuery->select($data_sql)
-            ->leftJoin('show_hours as h','h.`cid`=`user_data`.`course_id` 
-                and date_format(user_data.create_at, \'%Y-%m-%d %H\') = date_format(h.time, \'%Y-%m-%d %H\')')
-            ->leftJoin('ad_plans as plan','plan.`id`=`user_data`.`plan_id`')
-            ->leftJoin('courses as c','c.`id`=`user_data`.`course_id`')
-            ->where($dataParams)
-            ->andWhere($filterInParams)
-            ->andWhere(['<>','plan.tf_status','4'])
-            ->andWhere(['<>','c.tf_status','4'])
-            ->groupBy($dgpParams);
+        //$today_sql = 'plan.tf_type,plan.tf_value,sum(h.show_num) as show_num, sum(h.click_num) as click_num,sum(h.book_num) as book_num, user_data.date_at';
+        $todayQuery = UserData::find()->select($today_sql);
+        if ($end_time == $today && $end_time == $begin_time) {
+            $todayQuery = $todayQuery
+                ->leftJoin('show_hours as h',
+                    'h.`cid`=`user_data`.`course_id` 
+                    and date_format(user_data.create_at, \'%H\')=date_format(h.time, \'%H\') 
+                    and user_data.date_at=\''.$today.'\'');
+        } else {
+            $todayQuery = $todayQuery
+                ->leftJoin('show_hours as h', 'h.`cid`=`user_data`.`course_id` and user_data.date_at=date(h.time)');
+        }
+        $todayDatas = $todayQuery->leftJoin('ad_plans as plan','plan.`id`=`user_data`.`plan_id`')
+            ->where($tdParams)
+            ->andWhere($todayFilterParams)
+            ->groupBy($tgpParams)
+            ->orderBy('user_data.create_at')
+            ->asArray()->all();
+
+        $his_sql_sel .= 'plan.tf_type,plan.tf_value,sum(h.show_num) as show_num,sum(h.click_num) as click_num,sum(h.book_num) as book_num, his_user_data.date_at';
+        $hisdataQuery = HisUserData::find()
+            ->select($his_sql_sel)
+            ->leftJoin('show_days as h','h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=h.time')
+            ->leftJoin('ad_plans as plan','plan.`id`=`his_user_data`.`plan_id`')
+            ->where($hdParams)
+            ->andWhere($hdfilterInParams)
+            ->groupBy($htgpParams);
 
         if ($is_export == '1') {
-            $datas = $dataQuery->orderBy($order_value .' '. $order_type)
+            $hisDatas = $hisdataQuery->orderBy($order_value, $order_type)
                 ->asArray()->all();
-        } else {
-            if ($begin_time != '' && $begin_time == $end_time) {
-                $page = new Pagination([
-                    'defaultPageSize' => 24,
-                    'totalCount' => $dataQuery->count(),
-                ]);
+
+            if (count($todayDatas)>0 && $begin_time != $today) {
+                //添加当天数据
+                array_unshift($hisDatas,$todayDatas[0]);
             } else {
-                $page = new Pagination([
-                    'defaultPageSize' => 9,
-                    'totalCount' => $dataQuery->count(),
-                ]);
+                $hisDatas = $todayDatas;
             }
 
-            $datas = $dataQuery->orderBy($order_value .' '. $order_type)
-                ->offset($page->offset)->limit($page->limit)
-                ->asArray()->all();
+            $sumClick = 0;
+            $sumbook = 0;
+            $sumshow = 0;
+            $sumClickRate = 0;
+            $sumBookRate = 0;
+            $sumCBRate = 0;
+            $sumDayCost = 0;
+            $resData = [];
+            foreach ($hisDatas as $data) {
+                $data['click_rate'] = round(($data['show_num']>0 ? $data['click_num'] / $data['show_num'] : 0),4)*100 . '%';
+                $data['book_rate'] = round(($data['show_num']>0 ? $data['book_num'] / $data['show_num'] : 0),4)*100 .'% ';
+                $data['click_book_rate'] = round(($data['click_num']>0 ? $data['book_num'] / $data['click_num'] : 0),4)*100 .'% ';
+                // TODO 日消耗暂时未计算
+                // 1:cpm, 2:cpc, 3:cpa, 4:cpl, 5:cps
+                if ($data['tf_type'] == '4') {
+                    $data['day_cost'] = $data['tf_value'] * $data['book_num'];
+                } else if ($data['tf_type'] == '3' || $data['tf_type'] == '2' ) {
+                    $data['day_cost'] = $data['tf_value'] * $data['click_num'];
+                }
+                $sumshow += $data['show_num'];
+                $sumbook += $data['book_num'];
+                $sumClick += $data['click_num'];
+                $sumDayCost += $data['day_cost'];
+                $resData[] = $data;
+            }
+            $sumClickRate = round(($sumshow>0 ? $sumClick/$sumshow : 0),4)*100 . '%';
+            $sumBookRate = round(($sumshow>0 ? $sumbook/$sumshow : 0),4)*100 . '%';
+            $sumCBRate = round(($sumClick>0 ? $sumbook/$sumClick : 0),4)*100 . '%';
+            // TODO 日消耗暂时未计算
+            $sumDatas = ['date_at'=>'总计','show_num'=> $sumshow,'click_num'=> $sumClick, 'click_rate'=>$sumClickRate,
+                'book_num'=>$sumbook, 'book_rate'=>$sumBookRate, 'click_book_rate'=>$sumCBRate , 'day_cost'=>$sumDayCost];
+
+            $titles = ['日期','曝光数','点击数','点击率','预约数','预约率','点击预约率','日消耗(元)'];
+
+            array_unshift($resData, $sumDatas);
+
+            $exportArr = [];
+            foreach ($resData as $value){
+                $temp = [];
+                $temp['date_at'] = $value['date_at'];
+                $temp['show_num'] = $value['show_num'];
+                $temp['click_num'] = $value['click_num'];
+                $temp['click_rate'] = $value['click_rate'];
+                $temp['book_num'] = $value['book_num'];
+                $temp['book_rate'] = $value['book_rate'];
+                $temp['click_book_rate'] = $value['click_book_rate'];
+                $temp['day_cost'] = $value['day_cost'];
+                $exportArr[] = $temp;
+            }
+
+            Util::ExportCsv($exportArr, $titles, $today);
+        }
+
+        $page = new Pagination([
+            'defaultPageSize' => 8,
+            'totalCount' => $hisdataQuery->count(),
+        ]);
+
+        $hisDatas = $hisdataQuery->orderBy($order_value, $order_type)
+            ->offset($page->offset)->limit($page->limit)
+            ->asArray()->all();
+
+        if (count($todayDatas)>0 && $begin_time != $today) {
+            //添加当天数据
+            array_unshift($hisDatas,$todayDatas[0]);
+        } else {
+            $hisDatas = $todayDatas;
         }
 
         //折线图数据
@@ -211,7 +309,7 @@ class SiteController extends Controller
         $sumDayCost = 0;
         $resData = [];
 
-        foreach ($datas as $data) {
+        foreach ($hisDatas as $data) {
             $data['click_rate'] = round(($data['show_num']>0 ? $data['click_num'] / $data['show_num'] : 0),4)*100;
             $data['book_rate'] = round(($data['show_num']>0 ? $data['book_num'] / $data['show_num'] : 0),4)*100;
             $data['click_book_rate'] = round(($data['click_num']>0 ? $data['book_num'] / $data['click_num'] : 0),4)*100;
@@ -228,7 +326,7 @@ class SiteController extends Controller
             $sumDayCost += $data['day_cost'];
             $resData[] = $data;
 
-            if ($end_time != '' && $end_time == $begin_time) {
+            if ($end_time == $today && $end_time == $begin_time) {
                 $xAxis[] = $data['hour'];
             } else {
                 $xAxis[] = $data['date_at'];
@@ -249,24 +347,6 @@ class SiteController extends Controller
             'book_num'=>$sumbook, 'book_rate'=>$sumBookRate, 'click_book_rate'=>$sumCBRate , 'day_cost'=>$sumDayCost];
         array_unshift($resData, $sumDatas);
 
-        if ($is_export == '1') {
-            $titles = ['日期','曝光数','点击数','点击率','预约数','预约率','点击预约率','日消耗(元)'];
-            $exportArr = [];
-            foreach ($resData as $value){
-                $temp = [];
-                $temp['date_at'] = $value['date_at'];
-                $temp['show_num'] = $value['show_num'];
-                $temp['click_num'] = $value['click_num'];
-                $temp['click_rate'] = $value['click_rate'];
-                $temp['book_num'] = $value['book_num'];
-                $temp['book_rate'] = $value['book_rate'];
-                $temp['click_book_rate'] = $value['click_book_rate'];
-                $temp['day_cost'] = $value['day_cost'];
-                $exportArr[] = $temp;
-            }
-            Util::ExportCsv($exportArr, $titles, $today);
-        }
-
         $c_id = count($userCourses)>0 ? (isset($c_id) ? $c_id : $userCourses[0]['id']) : '-1';
         $plan_id = count($userPlans)>0 ? (isset($plan_id) ? $plan_id : $userPlans[0]['id']) : '-1';
 
@@ -282,41 +362,10 @@ class SiteController extends Controller
             //'sum_data' => $sumDatas
         ];
 
-        //处理按小时显示图表
-        if ($end_time != '' && $end_time == $begin_time) {
-            $hourAxis = ["00","01","02","03","04","05","06","07","08","09","10","11","12",
-                 "13","14","15","16","17","18","19","20","21","22","23","24"];
-            $hour_show_num_arr = [];
-            $hour_click_num_arr = [];
-            $hour_book_num_arr = [];
-            $hour_click_rate_arr = [];
-            $hour_book_rate_arr = [];
-            $hour_click_book_rate_arr = [];
-            foreach ($hourAxis as $axi) {
-                if (in_array($axi, $xAxis)) {
-                    $hour_show_num_arr[] = array_pop($show_num_arr);
-                    $hour_click_num_arr[] = array_pop($click_num_arr);
-                    $hour_click_rate_arr[] = array_pop($click_rate_arr);
-                    $hour_book_num_arr[] = array_pop($book_num_arr);
-                    $hour_book_rate_arr[] = array_pop($book_rate_arr);
-                    $hour_click_book_rate_arr[] = array_pop($click_book_rate_arr);
-                } else {
-                    $hour_show_num_arr[] = 0;
-                    $hour_click_num_arr[] = 0;
-                    $hour_click_rate_arr[] = 0;
-                    $hour_book_num_arr[] = 0;
-                    $hour_book_rate_arr[] = 0;
-                    $hour_click_book_rate_arr[] = 0;
-                }
-            }
-            $xAxis = $hourAxis;
-            $show_num_arr = $hour_show_num_arr;
-            $click_num_arr = $hour_click_num_arr;
-            $book_num_arr = $hour_book_num_arr;
-            $click_rate_arr = $hour_click_rate_arr;
-            $book_rate_arr = $hour_book_rate_arr;
-            $click_book_rate_arr = $hour_click_book_rate_arr;
-        }
+        //        if ($end_time == $today && $end_time == $begin_time) {
+        //            $xAxis = ["0:00","1:00","2:00","3:00","4:00","5:00","6:00","7:00","8:00","9:00","10:00","11:00","12:00",
+        //                 "13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00","24:00"];
+        //        }
 
 //        var_dump($click_rate_arr);
 //        var_dump($book_rate_arr);
@@ -343,6 +392,135 @@ class SiteController extends Controller
             ],
             'page' => $page
         ]);
+    }
+
+    public function actionUserDatas() {
+        $user_id = Yii::$app->user->id;
+        $request = Yii::$app->request;
+
+        $page_size = isset($request->page_size) ? $request->page_size : 10;
+        $page_num = isset($request->page_num) ? $request->page_num : 1;
+//        var_dump($page_size);
+//        return;
+
+
+        $plan_id = $request->get('plan_id');
+        $c_id = $request->get('c_id');
+
+        $begin_time = $request->get('begin_time');
+        $end_time = $request->get('end_time');
+
+        $order_value = $request->get('order_value') ?: 'date_at';
+        //1-> asc, 0->desc;
+        $order_type = $request->get('order_value') && $request->get('order_value')==1  ? 'ASC' : 'DESC';
+        $apQuery = AdPlans::find();
+        $cQuery = Courses::find();
+        /*参数字段*/
+        $aPparams = ['user_id'=>$user_id];              //广告计划查询参数
+        $cParams = ['user_id'=>$user_id];               //广告素材查询参数
+        $tdParams = ['user_id' => $user_id];            //当天数据查询参数
+        $hdParams = ['user_id' => $user_id];            //历史数据查询参数
+        $tgpParams = 'user_data.user_id';
+        $htgpParams = '';              //历史数据分组参数
+
+        if (!$plan_id && !$c_id){
+            $his_sql_sel = 'his_user_data.user_id as id,';
+        }
+        if ($plan_id) {
+            $aPparams['id'] = $plan_id;
+            $cParams['plan_id'] = $plan_id;
+            $tdParams['plan_id'] = $plan_id;
+            $hdParams['plan_id'] = $plan_id;
+            $tgpParams = $tgpParams. ',user_data.plan_id';
+
+            $his_sql_sel = 'his_user_data.plan_id as id,';
+
+        }
+        if ($c_id) {
+            $cParams['id'] = $c_id;
+            $tdParams['course_id'] = $c_id;
+            $hdParams['course_id'] = $c_id;
+            $tgpParams = $tgpParams. ',user_data.course_id';
+
+            $his_sql_sel = 'his_user_data.course_id as id,';
+        }
+
+        $his_sql_sel .= ',show_num, click_num, book_num, his_user_data.date_at';
+        $htgpParams = 'his_user_data.date_at';
+//        $htgpParams = 'his_user_data.date_at, his_user_data.course_id';
+
+        $choosePlans = $apQuery->where($aPparams)->orderBy('id')->all();
+        $chooseCourses = $cQuery->where($cParams)->orderBy('id')->all();
+
+        $todayDatas = UserData::find()
+            ->select('user_data.id,sum(h.show) as "show_num", sum(h.view) as click_num,sum(h.book) as book_num,
+                user_data.date_at')
+            ->leftJoin('hours as h', 'h.`cid`=`user_data`.`course_id`')
+            ->where($tdParams)
+            ->groupBy($tgpParams)
+            ->orderBy('create_at')
+            ->asArray()
+            ->all();
+
+//        $page = new Pagination(['totalCount' => ]);
+//        $hisDatas = HisUserData::find()
+//            ->select($his_sql_sel)
+//            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
+//            ->where($hdParams)
+//            ->groupBy($htgpParams)
+//            ->orderBy($order_value, $order_type)
+//            ->asArray()
+//            ->all();
+        $totalCount = HisUserData::find()
+            ->select($his_sql_sel)
+            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
+            ->where($hdParams)
+            ->groupBy($htgpParams)->count();
+        $page_num = max(min(ceil($totalCount/$page_size), $page_num),1);
+        $hisDatas = HisUserData::find()
+            ->select($his_sql_sel)
+            ->leftJoin('hours as h', 'h.`cid`=`his_user_data`.`course_id` and his_user_data.date_at=date(h.time)')
+            ->where($hdParams)
+            ->groupBy($htgpParams)
+            ->orderBy($order_value, $order_type)
+            ->limit($page_size)
+            ->offset(($page_num-1)*$page_size)
+            ->asArray()
+            ->all();
+
+        //var_dump($hisDatas);
+        //return;
+
+        $sumClick = 0;
+        $sumbook = 0;
+        $sumshow = 0;
+        $sumClickRate = 0;
+        $sumBookRate = 0;
+        $resHisData = [];
+        foreach ($hisDatas as $hisData) {
+            $hisData['click_rate'] = round(($hisData['show_num']>0 ? $hisData['click_num'] / $hisData['show_num'] : 0),4)*100 . '%';
+            $hisData['book_rate'] = round(($hisData['show_num']>0 ? $hisData['book_num'] / $hisData['show_num'] : 0),4)*100 .'% ';
+            // TODO 日消耗暂时未计算
+            $hisData['day_cost'] = 0;
+            $sumshow +=  $hisData['show_num'];
+            $sumbook +=  $hisData['book_num'];
+            $sumClick +=  $hisData['click_num'];
+            $resHisData[] = $hisData;
+        }
+        $sumClickRate = round(($sumshow>0 ? $sumClick/$sumshow : 0),4)*100 . '%';
+        $sumBookRate = round(($sumshow>0 ? $sumbook/$sumshow : 0),4)*100 . '%';
+        // TODO 日消耗暂时未计算
+        $sumDatas = ['总计', $sumshow, $sumClick, $sumClickRate, $sumbook, $sumBookRate, 0];
+
+        $datas = [
+            'today_data' => $todayDatas,
+            'his_data' => $resHisData,
+            'sum_data' => $sumDatas,
+            'page_num' => $page_num,
+            'page_size' => ceil($totalCount/$page_size)
+        ];
+        Yii::$app->response->format=Response::FORMAT_JSON;
+        return ['data' => $datas];
     }
 
     /**
@@ -406,30 +584,31 @@ class SiteController extends Controller
         $user_id = Yii::$app->user->id;
         $request = Yii::$app->request;
 
-        $req_year = $request->get('year');
-        $req_tf_type = $request->get('tf_type') ?: '3';
 
-        $params = [
-            'user_data.user_id' => $user_id,
-            'c.tf_type' => $req_tf_type
-        ];
+        $req_year = $request->get('year');
+        $params = ['user_id'=>$user_id];
+        $hisParams = ['user_id'=>$user_id];
         if ($req_year) {
             $params["DATE_FORMAT(`date_at`, '%Y')"] = $req_year;
+            $hisParams["DATE_FORMAT(`date_at`, '%Y')"] = $req_year;
         }
 
-        $datas = UserData::find()->select('count(*) as nums,user_data.date_at')
-            ->leftJoin('courses c','c.id=user_data.course_id')
-            ->where($params)
-            ->groupBy('user_data.date_at,course_id,c.tf_type')
+        $todayDatas = UserData::find()->select('count(*) as nums,date_at')->where($params)
+            ->groupBy('date_at,course_id')
             ->asArray()
             ->all();
+
+        $hisDatas = HisUserData::find()->select('count(*) as nums,date_at')->where($hisParams)
+            ->groupBy('date_at,course_id')
+            ->asArray()
+            ->all();
+        $datas = array_merge($hisDatas,$todayDatas);
         $resData = [];
+
 
         foreach ($datas as $data){
             $resData[$data['date_at']] = $data['nums'];
         }
-
-        $resData['tf_type'] = $req_tf_type;
 
         return $this->render('intentuser',
             [
@@ -475,7 +654,7 @@ class SiteController extends Controller
         $scQuery= $scQuery->select('courses.*, ap.plan_name')
             ->leftJoin('ad_plans ap','ap.id=`courses`.`plan_id`')
             ->where($scParams)->andWhere(['<>','courses.tf_status','4'])
-            ->orderBy('create_at desc');
+            ->orderBy('create_at');
         $adPage = new Pagination([
             'defaultPageSize' => 10,
             'totalCount' => $adPQuery->count(),
@@ -493,11 +672,11 @@ class SiteController extends Controller
             ->asArray()->all();
         $selPlan = count($totalPlans)>0 ? (isset($selPlan) ? $selPlan : $totalPlans[0]['id']) : '';
 
-        $adPlans = $adPQuery->orderBy('create_at desc')
+        $adPlans = $adPQuery->orderBy('create_at')
             ->offset($adPage->offset)
             ->limit($adPage->limit)
             ->all();
-        $adCourses= $scQuery->orderBy('create_at desc')
+        $adCourses= $scQuery->orderBy('create_at')
             ->offset($scPage->offset)
             ->limit($scPage->limit)
             ->asArray()->all();
@@ -649,10 +828,10 @@ class SiteController extends Controller
 
         $flowIns = $flowInQuery->offset($flowInPage->offset)
             ->limit($flowInPage->limit)
-            ->orderBy('create_at desc')->all();
+            ->orderBy('create_at', 'desc')->all();
         $flowOuts = $flowOutQuery->offset($flowOutPage->offset)
             ->limit($flowOutPage->limit)
-            ->orderBy('create_at desc')->asArray()->all();
+            ->orderBy('create_at')->all();
 
         $data = [
             'avail_fund'=> $user->avail_fund,

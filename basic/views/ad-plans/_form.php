@@ -104,7 +104,7 @@ use yii\widgets\ActiveForm;
 <!--                <div class="col-lg-8">-->
 <!--                    <input type="text" id="plan-num" value="--><?php //echo $model->plan_number; ?><!--" name="plan_num" placeholder="请输入广告计划编号" class="form-control">-->
 <!--                </div>-->
-<!--<!--                <label style="color: gray;font-size: 12px;">字符不超过30个</label>-->
+<!--                <label style="color: gray;font-size: 12px;">字符不超过30个</label>-->
 <!--            </div>-->
             <div class="form-group">
                 <label class="form-label col-lg-2">广告计划名称:</label>
@@ -117,15 +117,15 @@ use yii\widgets\ActiveForm;
                 <label class="form-label col-lg-2">投放方式:</label>
                 <div class="col-lg-8">
                     <div class="form-group">
-                        <label class="form-label col-lg-1">
+                        <label class="form-label col-lg-1" style="color: gray">
                             <input type="radio" name="radio_tf_type" value="1" <?php echo $model->tf_type=='1' ?'checked':''; ?> disabled>CPM</label>
-                        <label class="form-label col-lg-1">
+                        <label class="form-label col-lg-1" style="color: gray">
                             <input type="radio" name="radio_tf_type" value="2" <?php echo $model->tf_type=='2' ?'checked':''; ?> disabled>CPC</label>
                         <label class="form-label col-lg-1">
-                            <input type="radio" name="radio_tf_type" value="3" <?php echo $model->tf_type=='3' ?'checked':''; ?>>CPA</label>
+                            <input type="radio" name="radio_tf_type" value="3" checked>CPA</label>
                         <label class="form-label col-lg-1">
                             <input type="radio" name="radio_tf_type" value="4" <?php echo $model->tf_type=='4' ?'checked':''; ?>>CPL</label>
-                        <label class="form-label col-lg-1">
+                        <label class="form-label col-lg-1" style="color: gray">
                             <input type="radio" name="radio_tf_type" value="5" <?php echo $model->tf_type=='5' ?'checked':''; ?> disabled>CPS</label>
                     </div>
 <!--                    <div class="form-group btn-group" role="group" aria-label="">-->
@@ -140,7 +140,7 @@ use yii\widgets\ActiveForm;
                         <div class="col-lg-6">
                             <input type="text" id="cash" value="<?php echo $model->tf_value; ?>" name="cash" placeholder="" class="form-control">
                         </div>
-                        <label id="lab-info" style="color: gray;font-size: 12px;">元/千次</label>
+                        <label id="lab-info" style="color: gray;font-size: 12px;">元</label>
                     </div>
                 </div>
             </div>
@@ -269,7 +269,7 @@ use yii\widgets\ActiveForm;
                 <div class="col-lg-8 form-group">
                     <label class="form-label col-lg-2"><input type="radio" name="radio_gender" value="0" <?php echo $model->sex=='0'||$model->sex==null ?'checked':''; ?>>不限</label>
                     <label class="form-label col-lg-2"><input type="radio" name="radio_gender" value="1" <?php echo $model->sex=='1' ?'checked':''; ?>>男</label>
-                    <label class="form-label col-lg-2"><input type="radio" name="radio_gender" value="-1" <?php echo $model->sex=='-1' ?'checked':''; ?>>女</label>
+                    <label class="form-label col-lg-2"><input type="radio" name="radio_gender" value="2" <?php echo $model->sex=='2' ?'checked':''; ?>>女</label>
                 </div>
             </div>
 

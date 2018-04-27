@@ -32,6 +32,7 @@ class FundFlows extends \yii\db\ActiveRecord
         return [
             [['user_id', 'flow_to'], 'required'],
             [['user_id'], 'integer'],
+            [['plan_id'], 'integer'],
             [['capital'], 'number'],
             [['flow_to'], 'string'],
             [['create_at', 'update_at'], 'safe'],
@@ -45,11 +46,12 @@ class FundFlows extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
+            'user_id' => 'User_ID',
+            'plan_id' => 'Plan_ID',
             'capital' => 'Capital',
-            'flow_to' => 'Flow To',
-            'create_at' => 'Create At',
-            'update_at' => 'Update At',
+            'flow_to' => 'Flow_To',
+            'create_at' => 'Create_At',
+            'update_at' => 'Update_At',
         ];
     }
 }

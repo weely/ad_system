@@ -46,7 +46,8 @@ $this->context->layout = false;
 
         <div id="sc_html" style="text-align: center">
             <h5>H5预览</h5>
-            <img src="<?php echo $model->img_html ?>" style="width: 270px;height: 400px;">
+            <iframe style="width:375px;height: 630px;overflow-y: scroll;" src="<?=$model['img_html']?>"></iframe>
+            <!--<img src="--><?php //echo $model->img_html ?><!--" style="width: 270px;height: 400px;">-->
         </div>
     </div>
 </div>

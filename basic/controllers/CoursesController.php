@@ -127,7 +127,7 @@ class CoursesController extends Controller
         }
         if (!isset($plans) || count($plans)<=0) {
             $plans = AdPlans::find()
-                ->select('id,old_plan_id,plan_number,plan_name,properties')
+                ->select('id,plan_number,plan_name,properties')
                 ->where($params)
                 ->andWhere(['<>','tf_status','4'])
                 ->asArray()
@@ -165,18 +165,20 @@ class CoursesController extends Controller
 //  广告LOGO          logo
 //  富文本编辑框       edit_html
 //  HTML源文件        img_html
+            $planModel = AdPlans::find()->where(['id'=>$request->post('plan_id')])->one();
+
             $model->user_id = $user_id;
-            $model->plan_id = $request->post('plan_id');
+            $model->plan_id = $planModel->id;
             $model->tf_status = 0;
-//            $model->tf_type = 0;
+            $model->tf_type = $planModel->tf_type;
 //            $model->tf_value = 0;
             $model->is_online = $request->post('is_online') ?: '0';
             $model->is_h5 = $request->post('is_h5') ?: '0';
             $model->title_img = $request->post('title_img') ?: '';
             $model->ad_sc_title = $request->post('sc_title');
-            $model->ad_type = '';
-            $model->tag_ids = '';
+            $model->tag_ids = $planModel->tag_ids;
             $model->logo = $request->post('logo') ?: '';
+            $model->is_link = $request->post('h5') ?: '0';
             $model->img_html = $request->post('img_html') ?: '';
             $model->properties = $request->post('properties') ?: '';
             $model->tags = $request->post('tags') ?: '';
@@ -240,9 +242,9 @@ class CoursesController extends Controller
             if (!file_exists($user_path)) {
                 mkdir($user_path);
             }
-//            $move_to_file = $user_path."/".time().rand(1,1000).substr($file_name,strrpos($file_name,"."));
-//            $move_to_file = $user_path."/".time().rand(1,1000).".".$file_name;
-            $move_to_file = $user_path."/".$file_name;
+            // $move_to_file = $user_path."/".$file_name;
+            // $move_to_file = $user_path."/".time().rand(1,1000).substr($file_name,strrpos($file_name,"."));
+            $move_to_file = $user_path."/".time().rand(1,1000).".".$file_name;
 
             if(move_uploaded_file($uploaded_file,iconv("utf-8","gb2312",$move_to_file))) {
                 return [
@@ -273,7 +275,7 @@ class CoursesController extends Controller
         $model = $this->findModel($id);
         $params['id'] = $model->plan_id;
         $plans = AdPlans::find()
-            ->select('id,old_plan_id,plan_number,plan_name,properties')
+            ->select('id,plan_number,plan_name,properties')
             ->where($params)
             ->andWhere(['<>','tf_status','4'])
             ->asArray()

@@ -8,7 +8,6 @@ use Yii;
  * This is the model class for table "ad_plans".
  *
  * @property string $id 主键id
- * @property string $old_plan_id 旧版本id
  * @property string $user_id 广告主id
  * @property string $tag_ids 课程标签id
  * @property string $plan_number 计划编号
@@ -18,7 +17,6 @@ use Yii;
  * @property int $tf_value 投放值
  * @property double $budget 每日预算
  * @property double $total_budget 总预算
- * @property double $price 每条单价
  * @property string $tf_date 投放日期
  * @property string $tf_period 投放时段
  * @property string $properties 投放区域
@@ -44,15 +42,16 @@ class AdPlans extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['old_plan_id', 'user_id', 'tf_value'], 'integer'],
+            [['user_id', 'tf_value'], 'integer'],
             [['tf_status', 'tf_type', 'sex'], 'string'],
-            [['budget', 'total_budget', 'price'], 'number'],
+            [['budget', 'total_budget'], 'number'],
             [['create_at', 'update_at'], 'safe'],
             [['tag_ids', 'plan_number', 'age', 'degree'], 'string', 'max' => 20],
             [['plan_name'], 'string', 'max' => 30],
             [['tf_date', 'tf_period'], 'string', 'max' => 22],
             [['properties'], 'string', 'max' => 50],
             [['plan_number'], 'unique'],
+            [['plan_name'], 'unique'],
         ];
     }
 
@@ -63,7 +62,6 @@ class AdPlans extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'old_plan_id' => 'Old Plan ID',
             'user_id' => '用户ID',
             'tag_ids' => 'Tag Ids',
             'plan_number' => '广告计划编号',
@@ -73,7 +71,6 @@ class AdPlans extends \yii\db\ActiveRecord
             'tf_value' => '投放值',
             'budget' => '预算',
             'total_budget' => '总预算',
-            'price' => '单价',
             'tf_date' => '投放日期',
             'tf_period' => '投放时段',
             'properties' => '投放区域',

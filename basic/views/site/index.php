@@ -32,7 +32,7 @@ $this->title = '竞价系统';
                 if (begin_time<=end_time) {
                     var req_url = location.href;
                     if (req_url.match(/index\.php\?r=site/) == null) {
-                        req_url = req_url + '/index.php?r=site';
+                        req_url = '/index.php?r=site';
                     }
                     if (req_url.match(/&begin_time=(\d{4}-\d{1,2}-\d{1,2})+&end_time=(\d{4}-\d{1,2}-\d{1,2})+/)) {
                         req_url = req_url.replace(/&begin_time=(\d{4}-\d{1,2}-\d{1,2})+&end_time=(\d{4}-\d{1,2}-\d{1,2})+/,
@@ -261,7 +261,7 @@ $this->title = '竞价系统';
             <!--                    <option>点击预约率</option>-->
             <!--                </select>-->
             <!--            </div>-->
-            <div id="DayChart" style="width: 100%;height:260px;">
+            <div id="DayChart" style="width: 100%;height:240px;">
 
             </div>
 
@@ -312,41 +312,66 @@ $this->title = '竞价系统';
                     data: show_num,
                     // data: [820, 932, 901, 934, 1290, 1330, 1320],
                     type: 'bar',
-                    itemStyle : { normal: {label : {show: true}}},
+                    itemStyle : { normal: {label : {show: true,
+                                position: 'top'}}},
                     // color: "red"
                 },{
                     name: "点击数",
                     data: click_num,
                     // data: [82, 93, 901, 934, 1290, 1330, 1320],
                     type: 'bar',
-                    itemStyle : { normal: {label : {show: true}}},
+                    itemStyle : { normal: {label : {show: true,
+                                position: 'top'}}},
                 },{
                     name: "点击率",
                     data: click_rate,
                     // data: [0.42, 0.093, 0.0901, 0.0934, 0.1290, 0.1330, 0.1320],
                     type: 'line',
                     yAxisIndex: 1,
-                    itemStyle : { normal: {label : {show: true}}},
+                    itemStyle : {
+                        normal: {
+                            label : {
+                                show: true,
+                                position: 'top',
+                                formatter: function(value){
+                                    return Math.round(parseFloat(value.data)*100)/100
+                                }}}},
                 },{
                     name: "预约数",
                     data: book_num,
                     // data: [82, 93, 901, 934, 1290, 1330, 1320],
                     type: 'bar',
-                    itemStyle : { normal: {label : {show: true}}},
+                    itemStyle : { normal: {label : {show: true,
+                                position: 'top'}}},
                 },{
                     name: "预约率",
                     data: book_rate,
                     // data: [0.20, 0.0932, 0.0901, 0.0934, 0.1290, 0.1330, 0.320],
                     type: 'line',
                     yAxisIndex: 1,
-                    itemStyle : { normal: {label : {show: true}}},
+                    itemStyle : {
+                        normal: {
+                            label : {
+                                show: true,
+                                position: 'top',
+                                formatter: function(value){
+                                    return Math.round(parseFloat(value.data)*100)/100
+                                }}}},
                 },{
                 name: "点击预约率",
                     data: click_book_rate,
                     // data: [0.10, 0.0832, 0.0701, 0.0734, 0.1290, 0.2330, 0.220],
                     type: 'line',
                     yAxisIndex: 1,
-                    itemStyle : { normal: {label : {show: true}}},
+                    itemStyle : {
+                        normal: {
+                            label : {
+                                show: true,
+                                position: 'top',
+                                formatter: function(value){
+                                    return Math.round(parseFloat(value.data)*100)/100
+                                }
+                            }}},
                 }]
             };
 
@@ -404,8 +429,8 @@ $this->title = '竞价系统';
                 <?php
                     foreach ($data['datas'] as $data) {
                         echo "<tr>";
-                        if ($flag == 'today') {
-                            echo "<td>".$data['hour']."</td>";
+                        if (isset($data['hour'])) {
+                            echo "<td>".$data['hour']."时</td>";
                         } else {
                             echo "<td>".$data['date_at']."</td>";
                         }

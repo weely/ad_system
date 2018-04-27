@@ -37,14 +37,26 @@ use yii\captcha\Captcha;
                     this.html += '<div class="col-lg-1 col-sm-3">' +
                         '<input type="button" id="year_'+ i +'" onclick="dataByYear(this)" class="form-control" value="'+i+'"></div>';
                 }
-                this.html += '</div><div class="row">';
+                this.html += '<div class="col-lg-offset-4 col-lg-5" style="">\n' +
+                    '  <label class="form-label col-lg-1" style="color: gray">\n' +
+                    '     <input type="radio" name="radio_tf_type" value="1"  disabled>CPM</label>\n'+
+                    '  <label class="form-label col-lg-1" style="color: gray">\n'+
+                    '     <input type="radio" name="radio_tf_type" value="2" disabled>CPC</label>\n'+
+                    '    <label class="form-label col-lg-1">\n'+
+                    '       <input type="radio" name="radio_tf_type" value="3" '+ (this.datas.tf_type==3 ? "checked":"") +'>CPA</label>\n'+
+                    '    <label class="form-label col-lg-1">\n'+
+                    '       <input type="radio" name="radio_tf_type" value="4" '+ (this.datas.tf_type==4 ? "checked":"") +'>CPL</label>\n'+
+                    '    <label class="form-label col-lg-1" style="color: gray">\n'+
+                    '        <input type="radio" name="radio_tf_type" value="5" disabled>CPS</label>\n'+
+                    '  </div>' +'</div>' +
+                    '<div class="row">';
                 for (var j=1;j<=this.totlaMonth;j++) {
                     this.html += '<div class="col-lg-4 col-sm-6 calendar-item"><h5 class="calendar-title">'+ j +
                         '月</h5><div class="col-lg-12" style="padding: 0px;">';
                     for(var t=1; t<=this.getDaysInMonth(this.year,j,0); t++) {
                         var date = this.year+'-'+(j>9?'':'0')+j+'-'+(t>9?'':'0')+t;
                         var show_number = typeof(calendar.datas[date])!='undefined' ? calendar.datas[date] : 0;
-                        this.html += '<span href="index.php?r=user-data/day-datas&date_at='+date+'" class="col-lg-1 calendar-date " ' +
+                        this.html += '<span href="index.php?r=user-data/day-datas&date_at='+date+'&tf_type='+ this.datas.tf_type +'" class="col-lg-1 calendar-date " ' +
                             'name="date-item" data-remote="false" data-target="#click-modal"><p class="item-date-number">'+ t +'</p>';
                         if (show_number > 0) {
                             this.html += '<p class="item-number">'+ show_number +'人</p></span>';
@@ -84,6 +96,20 @@ use yii\captcha\Captcha;
         // $('#click-modal').on('loaded.bs.modal', function (e) {
         //     // location.reload()
         // });
+        $("input[name='radio_tf_type']").click(function(){
+            var req_url = location.href
+            var tf_type = $(this).val()
+            if (req_url.match(/index\.php\?r=site\/intent-user/i) == null) {
+                req_url = '/index.php?r=site/intent-user';
+            }
+            if (req_url.match(/&tf_type=[1-5]{0,1}/i)) {
+                req_url = req_url.replace(/&tf_type=[1-5]{0,1}/, '&tf_type=' + tf_type);
+            } else {
+                req_url += '&tf_type=' + tf_type;
+            }
+            location.href = req_url
+        });
+
     });
 
     function dataByYear(obj){

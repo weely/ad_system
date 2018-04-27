@@ -6,25 +6,6 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\AdPlans */
 
-/**
-    //$this->title = "计划详情";
-    //$this->title = $model->id;
-    //$this->params['breadcrumbs'][] = ['label' => 'Ad Plans', 'url' => ['index']];
-    //$this->params['breadcrumbs'][] = $this->title;
-
-
-    //    <h2><?= Html::encode($this->title) ?><!--</h2>-->
-    <!--<p>-->
-    <!--    --><?//= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-    <!--    --><?//= Html::a('Delete', ['delete', 'id' => $model->id], [
-    //        'class' => 'btn btn-danger',
-    //        'data' => [
-    //            'confirm' => 'Are you sure you want to delete this item?',
-    //            'method' => 'post',
-    //        ],
-    //    ]) ?>
-    <!--</p>-->
-*/
 $this->context->layout = false;
 ?>
 <div class="ad-plans-view">
@@ -34,21 +15,51 @@ $this->context->layout = false;
         'model' => $model,
         'attributes' => [
 //            'id',
-//            'old_plan_id',
 //            'user_id',
 //            'tag_ids',
-            'plan_number',
+//            'plan_number',
             'plan_name',
-            'tf_status',
-            'tf_type',
+            [
+            'attribute'=>'tf_status',
+            'value'=>$model->tf_status == '1' ? '开启' : '关闭',
+            ],
+//            'tf_status',
+            [
+                'attribute'=>'tf_type',
+                'value'=> $model->tf_type == '1'?'CPM':($model->tf_type=='2'?'CPC':
+                    ($model->tf_type=='3'?'CPA':($model->tf_type=='4'?'CPL':($model->tf_type=='5'?'CPS':'')))),
+            ],
             'tf_value',
             'budget',
-            'tf_date',
-            'tf_period',
-            'properties',
-            'age',
-            'sex',
-            'degree',
+            [
+                'attribute'=>'tf_date',
+                'value'=> $model->tf_date ? (stripos($model->tf_date,',') !==false ?
+                    preg_replace('/,/i','~',$model->tf_date) : $model->tf_date ) : '不限'
+            ],
+            [
+                'attribute'=>'tf_period',
+                'value'=> $model->tf_period ? (stripos($model->tf_period,',') !==false ?
+                    preg_replace('/,/i','~',$model->tf_period) : $model->tf_period ) : '不限'
+            ],
+            [
+                'attribute'=>'properties',
+                'value'=>$model->properties == '' ? '不限' : $model->properties,
+            ],
+            [
+                'attribute'=>'age',
+                'value'=>$model->age == '' ? '不限' : $model->age,
+            ],
+            [
+                'attribute'=>'sex',
+                'value'=>$model->sex == '0' ? '不限' : ($model->sex == '1' ? '男' : '女'),
+            ],
+            [
+                'attribute'=>'degree',
+                'value'=> stripos($model->degree,',') !==false ?
+                    (Yii::$app->params['tf_degree'][explode(',', $model->degree)[0]] . '~' .
+                    Yii::$app->params['tf_degree'][explode(',', $model->degree)[1]]) :
+                    Yii::$app->params['tf_degree'][$model->degree],
+            ],
             'create_at',
             'update_at',
         ],

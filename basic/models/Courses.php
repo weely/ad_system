@@ -8,7 +8,6 @@ use Yii;
  * This is the model class for table "courses".
  *
  * @property string $id
- * @property string $id_project
  * @property string $user_id 广告主id
  * @property string $plan_id 计划id
  * @property int $tf_status 投放状态:1.投放中,2.待投放,0.待审核;3.暂停投放,4.删除
@@ -21,6 +20,7 @@ use Yii;
  * @property string $ad_type 广告类型
  * @property string $tag_ids 广告类型标签
  * @property string $logo logo
+ * @property string $is_link 是否是落地页链接
  * @property string $img_html 详情页大图
  * @property string $properties 广告特点
  * @property string $tags 广告标签
@@ -49,9 +49,9 @@ class Courses extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_project', 'user_id', 'plan_id', 'tf_status', 'tf_value', 'today', 'total'], 'integer'],
+            [['user_id', 'plan_id', 'tf_status', 'tf_value', 'today', 'total'], 'integer'],
             [['plan_id'], 'required'],
-            [['tf_type', 'is_online', 'is_h5'], 'string'],
+            [['tf_type', 'is_online', 'is_h5', 'is_link'], 'string'],
             [['create_at', 'update_at'], 'safe'],
             [['title_img', 'ad_sc_title', 'properties', 'tags'], 'string', 'max' => 50],
             [['ad_type'], 'string', 'max' => 20],
@@ -67,7 +67,6 @@ class Courses extends \yii\db\ActiveRecord
     {
         return [
             'id' => '广告素材ID',
-            'id_project' => 'Id_Project',
             'user_id' => '用户ID',
             'plan_id' => '所属计划ID',
             'tf_status' => '素材投放状态',
@@ -80,6 +79,7 @@ class Courses extends \yii\db\ActiveRecord
             'ad_type' => '素材类型',
             'tag_ids' => '素材所属类型ID',
             'logo' => 'Logo',
+            'is_link' => 'Is_Link',
             'img_html' => 'H5大图',
             'properties' => '广告特点',
             'tags' => 'Tags',
