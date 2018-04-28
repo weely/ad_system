@@ -168,8 +168,8 @@ class SiteController extends Controller
             ->leftJoin('courses as c','c.`id`=`user_data`.`course_id`')
             ->where($dataParams)
             ->andWhere($filterInParams)
-            ->andWhere(['<>','plan.tf_status','4'])
-            ->andWhere(['<>','c.tf_status','4'])
+//            ->andWhere(['<>','plan.tf_status','4'])
+//            ->andWhere(['<>','c.tf_status','4'])
             ->groupBy($dgpParams);
 
         if ($is_export == '1') {

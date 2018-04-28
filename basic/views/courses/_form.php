@@ -398,15 +398,16 @@ use yii\widgets\ActiveForm;
                         <div class="btn-box box-item" style="padding-left: 20px">
                             <div class="footer-left">
                                 <p class="row" style="margin: 0 0 10px;">
-                                    <input id="btn_7" class="col-lg-3 form-control" type="" name="" value="价值" style="width:30%">
-                                    <strong style="width:100px;overflow: hidden;display: block;padding:0;width:30%" class="money-num col-lg-3"><input maxlength="4" id="btn_4" type="" name="" value="288" class="form-control"></strong>
-                                    <input id="btn_8" class="col-lg-3 form-control" type="" name="" value="元" style="width:30%">
+                                    <input id="btn_7" class="col-lg-3 form-control" type="text" name="btn_7" value="<?php echo $course_labels['lab_1']?>" style="width:30%">
+                                    <strong style="width:100px;overflow: hidden;display: block;padding:0;width:30%" class="money-num col-lg-3">
+                                        <input maxlength="4" id="btn_4" type="text" name="btn_4" value="<?php echo $course_labels['lab_2']?>" class="form-control"></strong>
+                                    <input id="btn_8" class="col-lg-3 form-control" type="text" name="btn_8" value="<?php echo $course_labels['lab_3']?>" style="width:30%">
                                 </p>
-                                <p class="course-type"><input class="form-control" id="btn_5" type="" name="" value="咨询会"></p>
+                                <p class="course-type"><input class="form-control" id="btn_5" type="text" name="btn_5" value="<?php echo $course_labels['lab_4']?>"></p>
                             </div>
                             <div class="footer-right">
                                 <div class="right-bottom">
-                                    <input class="form-control" id="btn_6" type="" name="" value="立即0元抢">
+                                    <input class="form-control" id="btn_6" type="text" name="btn_6" value="<?php echo $course_labels['lab_5']?>">
                                 </div>
                             </div>
                         </div>
@@ -414,27 +415,16 @@ use yii\widgets\ActiveForm;
                         <div class="succeed-box box-item"  style="padding-left: 20px">
                             <div class="succeed-text-box">
                                 <p>
-                                    <strong id="compellation"><input class="form-control" id="btn_1" type="" name="" value="您好"></strong><br>
-                                    <input class="form-control" id="btn_2" type="" name="" value="，您已成功获得咨询会礼包,学校老师会通过"><br>
+                                    <strong id="compellation"><input class="form-control" id="btn_1" type="text" name="btn_1" value="<?php echo $course_labels['lab_6']?>"></strong><br>
+                                    <input class="form-control" id="btn_2" type="text" name="btn_2" value="<?php echo $course_labels['lab_7']?>"><br>
                                     <strong id="uphone">18888888888</strong><br>
-                                    <input class="form-control" id="btn_3" type="" name="" value="联系您">
+                                    <input class="form-control" id="btn_3" type="text" name="btn_3" value="<?php echo $course_labels['lab_8']?>">
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
             <?php endif ?>
-           <!--  <div class="form-group">
-                <label class="form-label col-lg-3">
-                    <input type="radio" name="h5" value="3">
-                    H5源文件</label>
-                <div class="col-lg-3" style="position: relative;">
-                    <input type="button" value="上传" id="" class="btn btn-default" style="display: block;
-                    position: absolute;z-index: 1;">
-                    <input type="file" id="" style="display: none;position: absolute;z-index: 5;opacity:0;">
-                    <input type="hidden" name="" value="">
-                </div>
-            </div> -->
         </div>
     </div>
 
@@ -457,7 +447,7 @@ use yii\widgets\ActiveForm;
             <div class="col-lg-9">
                 <div id="properties_pre" style="height: 20px">
                     <span style="font-size: 14px;">线上</span>
-                    <span style="font-size: 14px;">可是</span>
+                    <span style="font-size: 14px;">课时</span>
                 </div>
                 <div id="tags_pre" style="margin-bottom: 5px;margin-top: 2px;height: 20px">
                     <span style="font-size: 14px;">免考</span>
@@ -479,18 +469,22 @@ use yii\widgets\ActiveForm;
         <h5>H5预览</h5>
 
         <div class="img_pre" style="position: relative;">
-            <p class="title_pre">请输入标题</p>
+            <p class="title_pre"><?php echo $model['ad_sc_title']?></p>
             <div style="position: relative;width:375px;height: 630px;overflow-y: scroll;">
-                <img id="img_html_src" src="<?php echo $model['img_html'] ?>" style=" width: 100%;height: auto;">
+                <img id="img_html_src" src="<?php echo $model['img_html'] ?>" style="width:375px;height: 630px">
             </div>
-        </div>
 
-        <?php if($model['tf_type'] == '3'): ?>
-        <div class="link_pre" style="display: none">
-            <p class="title_pre">请输入标题</p>
-            <iframe style="width:375px;height: 630px;overflow-y: scroll;" src="<?=$model['img_html']?>"></iframe>
-        </div>
-        <?php elseif ($model['tf_type'] == '4'): ?>
+
+    <?php if($model['tf_type'] == '3'): ?>
+            <div class="link_pre" style="display: none">
+                <p class="title_pre"><?php echo $model['ad_sc_title']?></p>
+                <iframe style="width:375px;height: 630px;overflow-y: scroll;" src="<?=$model['img_html']?>"></iframe>
+            </div>
+    <?php elseif ($model['tf_type'] == '4'): ?>
+        <div class="footer-em">了解更多课程信息，请下载 <span class="text-em">名校MBA指南</span> APP</div>
+        <div class="contact-us"><p>智联教育广告投放，请联系Ada：15901822548</p></div>
+        <div style="height: 146px;"></div>
+
         <!-- 显示按钮-->
         <footer id="footer-first" style="position: absolute;">
             <div class="apply-box">
@@ -517,19 +511,18 @@ use yii\widgets\ActiveForm;
                 </div>
             </div>
         </footer>
-        <?php endif;?>
-        <div class="footer-em">了解更多课程信息，请下载 <span class="text-em">名校MBA指南</span> APP</div>
-        <div class="contact-us"><p>智联教育广告投放，请联系Ada：15901822548</p></div>
-        <div style="height: 146px;"></div>
-
-        <footer id="footer-first" class="footer-second"  style="position: relative;display:none;">
-            <div class="succeed-box box-item" style="display: block">
-                <div class="succeed-text-box">
-                    <p><strong id="compellation"><span id="btn_1_pre">您好</span></strong><span id="btn_2_pre">您已成功获得咨询会礼包，学校老师会通过</span><strong id="uphone">18888888888</strong><span id="btn_3_pre">联系您</span></p>
-                </div>
-            </div>
-        </footer>
+    <?php endif;?>
+        </div>
     </div>
+    <?php if ($model['tf_type'] == '4'): ?>
+    <footer id="footer-first" class="footer-second"  style="position: relative;">
+        <div class="succeed-box box-item" style="display: block">
+            <div class="succeed-text-box">
+                <p><strong id="compellation"><span id="btn_1_pre">您好</span></strong><span id="btn_2_pre">您已成功获得咨询会礼包，学校老师会通过</span><strong id="uphone">18888888888</strong><span id="btn_3_pre">联系您</span></p>
+            </div>
+        </div>
+    </footer>
+    <?php endif;?>
 </div>
 
 <div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>

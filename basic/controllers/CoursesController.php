@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\AdPlans;
+use app\models\CourseLabInfos;
 use Yii;
 use app\models\Courses;
 use app\models\CoursesSearch;
@@ -139,11 +140,23 @@ class CoursesController extends Controller
         }
 
         $model = new Courses();
-//        $model = $model->find()->where(['id'=>$model->id])->asArray()->all();
-//        $model = $model->findAll($model);
+
+        $course_lab_info = [
+            'lab_1' => "价值",
+            'lab_2' => "288",
+            'lab_3' => "元",
+            'lab_4' => "咨询会",
+            'lab_5' => "立即0元抢",
+            'lab_6' => "您好",
+            'lab_7' => "，您已成功获得咨询会礼包,学校老师会通过",
+            'lab_8' => "联系您",
+        ];
+
+        //$model = $model->find()->where(['id'=>$model->id])->asArray()->all();
         return $this->render('create', [
             'model' => $model,
-            'plans' => $plans
+            'plans' => $plans,
+            'course_labels' => $course_lab_info
         ]);
     }
 
@@ -152,45 +165,85 @@ class CoursesController extends Controller
         $user_id = Yii::$app->user->id;
         $params = ['user_id' => $user_id];
         $request = Yii::$app->request;
-        if ($request->isPost) {
-            if ($request->post('id')) {
-                $model = $this->findModel($request->post('id'));
-            } else {
-                $model = new Courses();
-                $model->create_at = date("Y-m-d H:i:s", mktime());
+
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if ($request->isPost) {
+                if ($request->post('id')) {
+                    $model = $this->findModel($request->post('id'));
+                } else {
+                    $model = new Courses();
+                    $model->create_at = date("Y-m-d H:i:s", mktime());
+                }
+                //  广告标题图片       title_img
+                //  广告特点           type_tags
+                //  广告LOGO          logo
+                //  富文本编辑框       edit_html
+                //  HTML源文件        img_html
+                $planModel = AdPlans::find()->where(['id' => $request->post('plan_id')])->one();
+
+                $model->user_id = $user_id;
+                $model->plan_id = $planModel->id;
+                $model->tf_status = 0;
+                $model->tf_type = $planModel->tf_type;
+                //$model->tf_value = 0;
+                $model->is_online = $request->post('is_online') ?: '0';
+                $model->is_h5 = $request->post('is_h5') ?: '0';
+                $model->title_img = $request->post('title_img') ?: '';
+                $model->ad_sc_title = $request->post('sc_title');
+                $model->tag_ids = $planModel->tag_ids;
+                $model->logo = $request->post('logo') ?: '';
+                $model->is_link = $request->post('h5') ?: '0';
+                $model->img_html = $request->post('img_html') ?: '';
+                $model->properties = $request->post('properties') ?: '';
+                $model->tags = $request->post('tags') ?: '';
+                $model->update_at = date("Y-m-d H:i:s", mktime());
+                if ($model->save()) {
+                    if ($model->tf_type == '4') {
+                        if ($model->id) {
+                            $courseLabInfo = CourseLabInfos::find()
+                                ->where(['course_id' => $model->id])->one();
+                            if (!$courseLabInfo) {
+                                $courseLabInfo = new CourseLabInfos();
+                                $courseLabInfo->course_id = $model->id;
+                            }
+                        } else {
+                            $courseLabInfo = new CourseLabInfos();
+                            $courseLabInfo->course_id = $model->id;
+                        }
+
+                        $lab1 = $request->post('btn_7');
+                        $lab2 = $request->post('btn_4');
+                        $lab3 = $request->post('btn_8');
+                        $lab4 = $request->post('btn_5');
+                        $lab5 = $request->post('btn_6');
+                        $lab6 = $request->post('btn_1');
+                        $lab7 = $request->post('btn_2');
+                        $lab8 = $request->post('btn_3');
+
+                        $courseLabInfo->lab_1 = $lab1;
+                        $courseLabInfo->lab_2 = $lab2;
+                        $courseLabInfo->lab_3 = $lab3;
+                        $courseLabInfo->lab_4 = $lab4;
+                        $courseLabInfo->lab_5 = $lab5;
+                        $courseLabInfo->lab_6 = $lab6;
+                        $courseLabInfo->lab_7 = $lab7;
+                        $courseLabInfo->lab_8 = $lab8;
+
+                        if (!$courseLabInfo->save()) {
+                            throw new \Exception('点击按钮信息保存异常！');
+                        }
+                    }
+                    $transaction->commit();
+
+                    return $this->redirect('/index.php?r=courses/check-page');
+                } else {
+                    throw new \Exception($model->errors());
+                }
             }
-
-//  广告标题图片       title_img
-//  广告特点           type_tags
-//  广告LOGO          logo
-//  富文本编辑框       edit_html
-//  HTML源文件        img_html
-            $planModel = AdPlans::find()->where(['id'=>$request->post('plan_id')])->one();
-
-            $model->user_id = $user_id;
-            $model->plan_id = $planModel->id;
-            $model->tf_status = 0;
-            $model->tf_type = $planModel->tf_type;
-//            $model->tf_value = 0;
-            $model->is_online = $request->post('is_online') ?: '0';
-            $model->is_h5 = $request->post('is_h5') ?: '0';
-            $model->title_img = $request->post('title_img') ?: '';
-            $model->ad_sc_title = $request->post('sc_title');
-            $model->tag_ids = $planModel->tag_ids;
-            $model->logo = $request->post('logo') ?: '';
-            $model->is_link = $request->post('h5') ?: '0';
-            $model->img_html = $request->post('img_html') ?: '';
-            $model->properties = $request->post('properties') ?: '';
-            $model->tags = $request->post('tags') ?: '';
-            $model->update_at = date("Y-m-d H:i:s", mktime());
-
-            if ($model->save()){
-                return $this->redirect('/index.php?r=courses/check-page');
-            } else {
-                var_dump($model->errors);
-                return;
-//                return $this->render('error',[]);
-            }
+        } catch (Exception $e) {
+            $transaction->rollback();//如果操作失败, 数据回滚
         }
     }
 
@@ -281,9 +334,28 @@ class CoursesController extends Controller
             ->asArray()
             ->all();
 
+        if ($model->tf_type == '4') {
+            $course_lab_info = CourseLabInfos::find()->where(['course_id'=>$model->id])->asArray()->one();
+            if (!$course_lab_info) {
+                $course_lab_info = [
+                    'lab_1' => "价值",
+                    'lab_2' => "288",
+                    'lab_3' => "元",
+                    'lab_4' => "咨询会",
+                    'lab_5' => "立即0元抢",
+                    'lab_6' => "您好",
+                    'lab_7' => "，您已成功获得咨询会礼包,学校老师会通过",
+                    'lab_8' => "联系您",
+                ];
+            }
+        } else {
+            $course_lab_info = [];
+        }
+
         return $this->render('create', [
             'model' => $model,
-            'plans' => $plans
+            'plans' => $plans,
+            'course_labels' => $course_lab_info
         ]);
     }
 
